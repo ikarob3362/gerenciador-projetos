@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerenciador de Projetos — Ikaro</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<style>
+:root {
+  --bg: #0f1117; --bg2: #1a1d27; --bg3: #242733; --bg4: #2e3142;
+  --border: #353849; --text: #e4e5eb; --text2: #9ba1b0; --text3: #6b7185;
+  --green: #22c55e; --green-bg: rgba(34,197,94,0.12);
+  --blue: #3b82f6; --blue-bg: rgba(59,130,246,0.12);
+  --purple: #8b5cf6; --purple-bg: rgba(139,92,246,0.12);
+  --orange: #f59e0b; --orange-bg: rgba(245,158,11,0.12);
+  --red: #ef4444; --red-bg: rgba(239,68,68,0.12);
+  --cyan: #06b6d4; --pink: #ec4899;
+  --radius: 10px; --shadow: 0 2px 8px rgba(0,0,0,0.3); --transition: all 0.2s ease;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;overflow:hidden;height:100vh}
+button{cursor:pointer;border:none;font-family:inherit}
+input,textarea,select{font-family:inherit}
+
+/* LOGIN SCREEN */
+.login-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#0f1117 0%,#1e293b 50%,#0f1117 100%)}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;width:400px;max-width:90vw}
+.login-card h1{font-size:28px;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:10px}
+.login-card .sub{color:var(--text3);font-size:13px;margin-bottom:32px}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:600;background:white;color:#333;transition:var(--transition)}
+.google-btn:hover{background:#f1f1f1;transform:translateY(-1px)}
+.google-btn img{width:20px;height:20px}
+.login-error{color:var(--red);font-size:12px;margin-top:12px}
+.login-loading{color:var(--text3);font-size:13px;margin-top:16px}
+
+/* APP LAYOUT */
+.app{display:none;height:100vh}
+.app.visible{display:flex}
+
+/* SIDEBAR */
+.sidebar{width:280px;min-width:280px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
+.sidebar-logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sidebar-logo span{font-size:22px}
+.sidebar-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sidebar-section{padding:16px 12px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3)}
+.sidebar-nav{flex:1;overflow-y:auto;padding-bottom:12px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;margin:2px 8px;border-radius:8px;cursor:pointer;transition:var(--transition);font-size:13px;font-weight:500;color:var(--text2);background:transparent;width:calc(100% - 16px);text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--bg4);color:var(--text)}
+.nav-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nav-item .nav-count{margin-left:auto;font-size:11px;color:var(--text3);background:var(--bg);padding:1px 7px;border-radius:10px}
+.add-project-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;margin:2px 8px;border-radius:8px;font-size:13px;color:var(--text3);background:transparent;width:calc(100% - 16px);text-align:left;transition:var(--transition)}
+.add-project-btn:hover{background:var(--bg3);color:var(--green)}
+
+/* USER BAR */
+.user-bar{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:var(--text3)}
+.logout-btn{padding:6px 10px;border-radius:6px;font-size:11px;background:var(--bg3);color:var(--text3);transition:var(--transition)}
+.logout-btn:hover{background:var(--red-bg);color:var(--red)}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOPBAR */
+.topbar{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-title{font-size:18px;font-weight:700}
+.topbar-badge{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.view-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;background:var(--bg3);color:var(--text2);transition:var(--transition)}
+.view-btn:hover{background:var(--bg4);color:var(--text)}
+.view-btn.active{background:var(--blue);color:white}
+
+/* ONLINE USERS */
+.online-users{display:flex;align-items:center;gap:-4px;margin-right:8px}
+.online-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--bg2);margin-left:-8px;object-fit:cover;position:relative}
+.online-dot:first-child{margin-left:0}
+.online-count{font-size:11px;color:var(--text3);margin-left:4px}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* DASHBOARD */
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:24px}
+.dash-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:var(--transition)}
+.dash-card:hover{border-color:var(--text3);transform:translateY(-2px)}
+.dash-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dash-card-name{font-weight:600;font-size:15px}
+.dash-card-icon{font-size:24px}
+.dash-progress-bar{height:6px;background:var(--bg);border-radius:6px;overflow:hidden;margin-bottom:8px}
+.dash-progress-fill{height:100%;border-radius:6px;transition:width 0.5s}
+.dash-card-stats{display:flex;justify-content:space-between;font-size:12px;color:var(--text3)}
+.dash-card-stats strong{color:var(--text)}
+
+/* TEAM SECTION */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.team-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:12px}
+.team-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.team-name{font-weight:600;font-size:13px}
+.team-tasks{font-size:11px;color:var(--text3)}
+.team-role-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+
+/* PHASE TABS */
+.phase-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.phase-tab{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;background:var(--bg2);color:var(--text2);border:1px solid var(--border);transition:var(--transition)}
+.phase-tab:hover{border-color:var(--text3)}
+.phase-tab.active{color:white;border-color:transparent}
+
+/* WEEK GROUP */
+.week-group{margin-bottom:16px}
+.week-group-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:var(--transition);user-select:none}
+.week-group-header:hover{border-color:var(--text3)}
+.week-group.open .week-group-header{border-radius:var(--radius) var(--radius) 0 0;border-bottom-color:transparent}
+.wg-left{display:flex;align-items:center;gap:12px}
+.wg-label{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--bg);color:var(--text3)}
+.wg-title{font-weight:600;font-size:14px}
+.wg-dates{font-size:12px;color:var(--text3)}
+.wg-right{display:flex;align-items:center;gap:10px}
+.wg-progress{width:60px;height:5px;background:var(--bg);border-radius:5px;overflow:hidden}
+.wg-progress-fill{height:100%;border-radius:5px;background:var(--green);transition:width 0.4s}
+.wg-count{font-size:11px;color:var(--text3);font-weight:600}
+.wg-chevron{color:var(--text3);font-size:16px;transition:transform 0.2s}
+.week-group.open .wg-chevron{transform:rotate(180deg)}
+.week-group-body{display:none;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:8px}
+.week-group.open .week-group-body{display:block}
+.wg-meta{display:flex;gap:8px;padding:6px 10px 10px;flex-wrap:wrap}
+.wg-meta-tag{font-size:10px;padding:3px 8px;border-radius:5px;font-weight:600}
+.wg-meta-resp{background:var(--blue-bg);color:var(--blue)}
+.wg-meta-tools{background:var(--orange-bg);color:var(--orange)}
+
+/* TASK ITEM */
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;transition:var(--transition)}
+.task-row:hover{background:var(--bg3)}
+.task-row.done{opacity:0.5}
+.task-checkbox{appearance:none;-webkit-appearance:none;width:20px;height:20px;min-width:20px;border:2px solid var(--border);border-radius:6px;cursor:pointer;transition:var(--transition);position:relative;margin-top:2px;background:transparent}
+.task-checkbox:hover{border-color:var(--green)}
+.task-checkbox:checked{background:var(--green);border-color:var(--green)}
+.task-checkbox:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;font-size:12px;font-weight:700}
+.task-content{flex:1}
+.task-text{font-size:13px;cursor:pointer}
+.task-row.done .task-text{text-decoration:line-through}
+.task-meta-row{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.task-assignee{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);background:var(--bg);padding:2px 8px 2px 2px;border-radius:12px;cursor:pointer}
+.task-assignee img{width:16px;height:16px;border-radius:50%}
+.task-assignee:hover{color:var(--blue)}
+.task-assignee-placeholder{font-size:11px;color:var(--text3);cursor:pointer;padding:2px 8px;border-radius:12px;background:var(--bg)}
+.task-assignee-placeholder:hover{color:var(--blue);background:var(--blue-bg)}
+.task-notes-toggle{font-size:11px;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:4px;background:none;padding:0}
+.task-notes-toggle:hover{color:var(--blue)}
+.has-notes{color:var(--blue)!important}
+.task-notes-area{display:none;margin-top:6px}
+.task-notes-area.open{display:block}
+.task-notes-input{width:100%;min-height:50px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);resize:vertical;outline:none}
+.task-notes-input:focus{border-color:var(--blue)}
+.task-notes-input::placeholder{color:var(--text3)}
+.task-done-by{font-size:10px;color:var(--text3);font-style:italic}
+.task-actions{display:flex;gap:4px;opacity:0;transition:opacity 0.2s}
+.task-row:hover .task-actions{opacity:1}
+.task-action-btn{padding:4px 6px;border-radius:4px;font-size:12px;background:transparent;color:var(--text3);transition:var(--transition)}
+.task-action-btn:hover{background:var(--bg);color:var(--text)}
+.task-action-btn.delete:hover{color:var(--red)}
+
+/* ADD TASK */
+.add-task-row{display:flex;gap:8px;padding:8px 12px;margin-top:4px}
+.add-task-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);outline:none}
+.add-task-input:focus{border-color:var(--green)}
+.add-task-input::placeholder{color:var(--text3)}
+.add-task-submit{padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;background:var(--green);color:white;transition:var(--transition)}
+.add-task-submit:hover{opacity:0.85}
+
+/* ASSIGNEE DROPDOWN */
+.assignee-dropdown{position:absolute;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:4px;z-index:200;min-width:180px;box-shadow:var(--shadow)}
+.assignee-option{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:12px;transition:var(--transition);background:none;width:100%;text-align:left;color:var(--text)}
+.assignee-option:hover{background:var(--bg3)}
+.assignee-option img{width:20px;height:20px;border-radius:50%}
+.assignee-option.remove{color:var(--red)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;width:480px;max-width:90vw;max-height:80vh;overflow-y:auto}
+.modal h3{font-size:16px;margin-bottom:16px}
+.modal-field{margin-bottom:14px}
+.modal-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block}
+.modal-input,.modal-select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);outline:none}
+.modal-input:focus,.modal-select:focus{border-color:var(--blue)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.modal-btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;transition:var(--transition)}
+.modal-btn-cancel{background:var(--bg3);color:var(--text2)}
+.modal-btn-cancel:hover{background:var(--bg4)}
+.modal-btn-confirm{background:var(--green);color:white}
+.modal-btn-confirm:hover{opacity:0.85}
+.color-options{display:flex;gap:8px;flex-wrap:wrap}
+.color-opt{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:var(--transition)}
+.color-opt:hover{transform:scale(1.15)}
+.color-opt.selected{border-color:white}
+
+/* ACTIVITY LOG */
+.activity-log{max-height:300px;overflow-y:auto}
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-avatar{width:24px;height:24px;border-radius:50%;margin-top:2px}
+.activity-text{font-size:12px;color:var(--text2)}
+.activity-text strong{color:var(--text)}
+.activity-time{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* SETUP SCREEN */
+.setup-screen{display:none;align-items:center;justify-content:center;height:100vh;background:var(--bg)}
+.setup-screen.visible{display:flex}
+.setup-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;width:560px;max-width:90vw}
+.setup-card h2{font-size:20px;margin-bottom:8px}
+.setup-card .sub{color:var(--text3);font-size:13px;margin-bottom:24px}
+.setup-field{margin-bottom:16px}
+.setup-field label{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px}
+.setup-field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);outline:none}
+.setup-field input:focus{border-color:var(--blue)}
+.setup-btn{width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:600;background:var(--green);color:white;margin-top:8px;transition:var(--transition)}
+.setup-btn:hover{opacity:0.85}
+.setup-help{font-size:11px;color:var(--text3);margin-top:16px;line-height:1.6}
+.setup-help a{color:var(--blue)}
+.setup-help code{background:var(--bg);padding:1px 5px;border-radius:3px;font-size:11px}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{width:60px;min-width:60px}
+  .sidebar-header span:last-child,.sidebar-section,.nav-item span:not(.nav-dot),.nav-count,.sidebar-sub,.add-project-btn span,.user-info,.logout-btn{display:none}
+  .nav-item{justify-content:center;padding:10px}
+  .add-project-btn{justify-content:center;padding:10px}
+  .user-bar{justify-content:center}
+  .content{padding:16px}
+  .topbar{padding:12px 16px}
+}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN (first time only) -->
+<div class="setup-screen" id="setup-screen">
+  <div class="setup-card">
+    <h2>🔧 Configuração Inicial</h2>
+    <div class="sub">Cole as credenciais do seu projeto Firebase para ativar o sistema.</div>
+    <div class="setup-field">
+      <label>API Key</label>
+      <input id="cfg-apiKey" placeholder="AIzaSy...">
+    </div>
+    <div class="setup-field">
+      <label>Auth Domain</label>
+      <input id="cfg-authDomain" placeholder="seu-projeto.firebaseapp.com">
+    </div>
+    <div class="setup-field">
+      <label>Database URL</label>
+      <input id="cfg-databaseURL" placeholder="https://seu-projeto-default-rtdb.firebaseio.com">
+    </div>
+    <div class="setup-field">
+      <label>Project ID</label>
+      <input id="cfg-projectId" placeholder="seu-projeto">
+    </div>
+    <button class="setup-btn" onclick="saveFirebaseConfig()">Ativar Sistema</button>
+    <div class="setup-help">
+      <strong>Como obter:</strong><br>
+      1. Acesse <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a><br>
+      2. Crie um projeto → Ative Authentication (Google) → Ative Realtime Database<br>
+      3. Em Configurações do projeto → seus apps → Web → copie as credenciais<br>
+      4. Na aba Realtime Database → Regras, cole:<br>
+      <code>{"rules":{".read":"auth!=null",".write":"auth!=null"}}</code>
+    </div>
+    <div id="setup-error" style="color:var(--red);font-size:12px;margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen" style="display:none">
+  <div class="login-card">
+    <h1><span>🚀</span> Gerenciador</h1>
+    <div class="sub">Projetos & Tarefas — Equipe Ikaro</div>
+    <button class="google-btn" onclick="loginWithGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
+      Entrar com Google
+    </button>
+    <div id="login-error" class="login-error"></div>
+    <div id="login-loading" class="login-loading" style="display:none">Conectando...</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><span>🚀</span> Projetos</div>
+      <div class="sidebar-sub">Gerenciador — Equipe</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Geral</div>
+      <button class="nav-item active" data-view="dashboard" onclick="showDashboard()">
+        <span class="nav-dot" style="background:var(--blue)"></span>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-view="team" onclick="showTeam()">
+        <span class="nav-dot" style="background:var(--cyan)"></span>
+        <span>Equipe</span>
+      </button>
+      <button class="nav-item" data-view="activity" onclick="showActivity()">
+        <span class="nav-dot" style="background:var(--purple)"></span>
+        <span>Atividades</span>
+      </button>
+      <div class="sidebar-section">Empresas</div>
+      <div id="sidebar-projects"></div>
+      <button class="add-project-btn" onclick="openNewProjectModal()">
+        <span style="font-size:16px">+</span>
+        <span>Nova Empresa</span>
+      </button>
+    </div>
+    <div class="user-bar" id="user-bar"></div>
+  </div>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title" id="topbar-title">Dashboard</span>
+        <span class="topbar-badge" id="topbar-badge" style="display:none"></span>
+      </div>
+      <div class="topbar-right">
+        <div class="online-users" id="online-users"></div>
+        <div id="topbar-actions"></div>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ======================== CONFIG ========================
+const CONFIG_KEY = 'ikaro_pm_firebase_config';
+const COLORS = ['#22c55e','#3b82f6','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#f97316'];
+
+let db, auth, currentUser = null;
+let projectsData = {};
+let usersData = {};
+let activityData = [];
+let currentView = 'dashboard';
+let currentProject = null;
+let currentPhase = 0;
+let assigneeDropdownEl = null;
+
+// ======================== DEFAULT DATA ========================
+const DEFAULT_PROJECTS = {
+  plugo: {
+    name:'PLugo Eletropostos', icon:'⚡', color:'#22c55e',
+    description:'Pontos de recarga para veículos elétricos',
+    phases: [
+      { name:'Fase 1 — Fundação', description:'Construir a base da marca, presença digital e estrutura mínima.', weeks:[
+        {num:'Sem 1',title:'Identidade e Pesquisa',dates:'07–11 Abr 2026',resp:'Você',tools:'Claude, Canva',tasks:[
+          {text:'Definir identidade verbal da PLugo (tom de voz, proposta de valor, diferenciais)',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Mapear concorrentes diretos no Brasil (Zletric, Tupinambá, WEG Charge, V2G, EZVolt)',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Definir público-alvo primário: motoristas de EV, condomínios, postos, shoppings, frotas',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar Brand Guide básico (cores, fontes, tom de voz)',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 2',title:'Site Institucional',dates:'14–18 Abr 2026',resp:'Você + Claude',tools:'Claude, Vercel/Hostinger, WhatsApp Business',tasks:[
+          {text:'Criar site institucional com landing page otimizada',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar páginas: Home, Sobre, Mapa de pontos, B2B, B2C, Contato/WhatsApp',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Integrar botão WhatsApp com mensagem pré-formatada',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Configurar domínio e hospedagem (Vercel gratuito ou Hostinger)',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 3',title:'Redes Sociais',dates:'21–25 Abr 2026',resp:'Você + Claude',tools:'Claude, Canva, Meta Business Suite',tasks:[
+          {text:'Criar Google Meu Negócio (um por ponto de recarga) e LinkedIn',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Reestruturar Instagram: bio, destaques',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar 12 posts para o mês (4 carrosséis, 4 reels, 4 stories)',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Temas: Como funciona um eletroposto?, Quanto custa carregar?, Onde encontrar PLugo',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 4',title:'Atendimento e CRM',dates:'28 Abr – 02 Mai 2026',resp:'Você',tools:'WhatsApp Business, Google Sheets, Claude',tasks:[
+          {text:'Configurar WhatsApp Business com catálogo e respostas rápidas',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar fluxo de atendimento: motorista → empresa → consultoria',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Definir métricas: seguidores, visitas site, contatos WhatsApp, recargas/mês',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar CRM básico no Google Sheets para leads e oportunidades',done:false,notes:'',assignee:'',doneBy:''}
+        ]}
+      ]},
+      { name:'Fase 2 — Aquisição e Posicionamento', description:'Gerar demanda, atrair motoristas e empresas.', weeks:[
+        {num:'Sem 5',title:'Landing Page B2B',dates:'05–09 Mai 2026',resp:'Você + Claude',tools:'Claude, Tally',tasks:[
+          {text:"Criar landing page: 'Quero instalar um eletroposto'",done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar formulário: nome, empresa, tipo, cidade, telefone',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar PDF de apresentação comercial profissional',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 6',title:'SEO e Conteúdo',dates:'12–16 Mai 2026',resp:'Você + Claude',tools:'Claude, Google Search Console',tasks:[
+          {text:'Criar artigo: Guia de instalação de eletroposto',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar artigo: Eletroposto em condomínio',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar artigo: Legislação sobre eletropostos',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Publicar artigos no site',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Configurar Google Search Console e enviar sitemap',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 7',title:'Prospecção B2B',dates:'19–23 Mai 2026',resp:'Você',tools:'Google Sheets, WhatsApp, LinkedIn',tasks:[
+          {text:'Mapear parceiros: concessionárias EV, construtoras, shoppings, postos',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar lista de 30 prospects B2B',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Definir script de abordagem (contato, follow-up, proposta)',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Iniciar abordagem via WhatsApp/LinkedIn',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 8',title:'Conteúdo Mês 2',dates:'26–30 Mai 2026',resp:'Você + Claude',tools:'Claude, Canva',tasks:[
+          {text:'Produzir 12 posts para junho',done:false,notes:'',assignee:'',doneBy:''},
+          {text:"Criar 1 vídeo: 'Tour por um eletroposto PLugo'",done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 9',title:'Tráfego Pago',dates:'02–06 Jun 2026',resp:'Você',tools:'Meta Ads, Claude',tasks:[
+          {text:'Campanha Instagram/Facebook R$300-500',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Definir público: carros elétricos, sustentabilidade',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar 2 criativos para A/B test',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 10',title:'Otimização e Modelo',dates:'09–13 Jun 2026',resp:'Você + Claude',tools:'Claude, Google Docs',tasks:[
+          {text:'Analisar resultados da campanha e otimizar',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar proposta padronizada B2B',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Documentar modelo de negócio em canvas',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 11',title:'Prospecção Ativa',dates:'16–20 Jun 2026',resp:'Você',tools:'Google Sheets, WhatsApp',tasks:[
+          {text:'Visitar/ligar para os 10 melhores prospects',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Levar proposta comercial + apresentação',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Registrar tudo no CRM',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 12',title:'Revisão de Meio de Caminho',dates:'23–27 Jun 2026',resp:'Você + Claude',tools:'Claude, Google Sheets',tasks:[
+          {text:'Analisar métricas: seguidores, leads, recargas, conversões',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Ajustar estratégia com base nos dados',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Planejar conteúdo de julho',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar relatório mensal de KPIs',done:false,notes:'',assignee:'',doneBy:''}
+        ]}
+      ]},
+      { name:'Fase 3 — Escala e Modelo Replicável', description:'Escalar pontos, consolidar modelo, desenhar franquia.', weeks:[
+        {num:'Sem 13-14',title:'Documentação Operacional',dates:'Jul sem 1–2',resp:'Você + Claude',tools:'Claude, Google Docs, draw.io',tasks:[
+          {text:'Documentar processo operacional completo',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar manual de operações PLugo (SOPs)',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar fluxograma: prospecção → contrato → instalação → ativação → operação',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 15-16',title:'Ferramentas de Conversão',dates:'Jul sem 3–4',resp:'Você + Claude',tools:'Claude (React + FAQ)',tasks:[
+          {text:'Criar calculadora de viabilidade B2B no site',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar página de FAQ completa',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 17-18',title:'Modelo de Consultoria',dates:'Ago sem 1–2',resp:'Você + Claude',tools:'Claude, Google Docs',tasks:[
+          {text:'Desenvolver pacote de consultoria',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar landing page para consultoria',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Definir precificação',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 19-20',title:'Indicação e Tráfego',dates:'Ago sem 3–4',resp:'Você + Claude',tools:'Claude, Meta Ads',tasks:[
+          {text:'Criar programa de indicação B2B',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Material de co-marketing com parceiros',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Segundo ciclo de tráfego pago',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 21-22',title:'Desenho de Franquia',dates:'Set sem 1–2',resp:'Você + Claude',tools:'Claude',tasks:[
+          {text:'Documentar modelo de franquia',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Pesquisar requisitos legais (Lei 13.966/2019, COF)',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar documento preliminar Franquia PLugo',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 23-24',title:'Revisão Trimestral',dates:'Set sem 3–4',resp:'Você + Claude',tools:'Google Sheets',tasks:[
+          {text:'Revisão: pontos, receita, leads, consultorias',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Ajustar metas para Q4',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Decidir contratação de comercial',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Planejar participação em eventos',done:false,notes:'',assignee:'',doneBy:''}
+        ]}
+      ]},
+      { name:'Fase 4 — Consolidação e Expansão', description:'Consolidar operação, lançar consultoria, preparar franquia.', weeks:[
+        {num:'Sem 25-28',title:'Lançamento Consultoria',dates:'Outubro 2026',resp:'Você + Claude',tools:'Claude, Meta Ads, YouTube',tasks:[
+          {text:'Lançamento oficial consultoria com campanha',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Webinar: Como abrir um eletroposto no Brasil',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Escalar tráfego pago',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar canal YouTube educativo',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 29-32',title:'Preparação de Franquia',dates:'Novembro 2026',resp:'Você + Claude',tools:'Claude',tasks:[
+          {text:'Refinar modelo de franquia',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Criar pitch deck para investidores',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Networking em eventos do setor',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Construir board de advisors',done:false,notes:'',assignee:'',doneBy:''}
+        ]},
+        {num:'Sem 33-36',title:'Balanço e Planejamento 2027',dates:'Dezembro 2026',resp:'Você + Claude',tools:'Google Sheets, Claude',tasks:[
+          {text:'Balanço anual: KPIs, receita, pontos',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Documentar aprendizados',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Planejamento 2027: expansão, franquia, novas cidades',done:false,notes:'',assignee:'',doneBy:''},
+          {text:'Preparar material de franquia para Q1 2027',done:false,notes:'',assignee:'',doneBy:''}
+        ]}
+      ]}
+    ]
+  },
+  solucoesup: {
+    name:'SoluçõesUP', icon:'🔒', color:'#3b82f6',
+    description:'Portaria remota/autônoma, controle de acesso, monitoramento',
+    phases:[{name:'Roadmap Pendente',description:'Roadmap detalhado será construído em breve.',weeks:[
+      {num:'—',title:'Próximas definições',dates:'A definir',resp:'Você + Claude',tools:'Claude',tasks:[
+        {text:'Documentar processos existentes dos colaboradores',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Criar manuais de procedimentos (N1, N2, campo)',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Implementar CRM para pipeline de vendas',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Atualizar site com serviços corretos',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Criar estratégia de marketing e captação',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Melhorar propostas comerciais',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Estruturar produtos recorrentes para escala nacional',done:false,notes:'',assignee:'',doneBy:''}
+      ]}
+    ]}]
+  },
+  'uplink-servico': {
+    name:'UpLink Serviço e Comércio', icon:'🏗️', color:'#8b5cf6',
+    description:'Prestação de serviço e fornecimento para indústria (ENEVA)',
+    phases:[{name:'Roadmap Pendente',description:'Roadmap detalhado será construído em breve.',weeks:[
+      {num:'—',title:'Próximas definições',dates:'A definir',resp:'Você + Claude',tools:'Claude',tasks:[
+        {text:'Criar site institucional',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Criar LinkedIn corporativo',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Estruturar documentação para licitações',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Estruturar documentação para leilões',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Mapear oportunidades no setor industrial',done:false,notes:'',assignee:'',doneBy:''}
+      ]}
+    ]}]
+  },
+  'uplink-provedor': {
+    name:'UpLink Provedor de Internet', icon:'🌐', color:'#f59e0b',
+    description:'Provedor de Internet (ISP) — desde 2019',
+    phases:[{name:'Roadmap Pendente',description:'Roadmap detalhado será construído em breve.',weeks:[
+      {num:'—',title:'Próximas definições',dates:'A definir',resp:'Você + Claude',tools:'Claude',tasks:[
+        {text:'Documentar processos dos funcionários (N1, N2, N3)',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Atualizar site www.uplinkrr.com.br',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Criar campanha de marketing e captação ativa',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Melhorar contratos de serviço',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Automatizar atendimento de demandas',done:false,notes:'',assignee:'',doneBy:''},
+        {text:'Expandir chatbot integrado ao ERP',done:false,notes:'',assignee:'',doneBy:''}
+      ]}
+    ]}]
+  }
+};
+
+// ======================== FIREBASE CONFIG ========================
+function getSavedConfig() {
+  try { return JSON.parse(localStorage.getItem(CONFIG_KEY)); } catch(e) { return null; }
+}
+
+function saveFirebaseConfig() {
+  const config = {
+    apiKey: document.getElementById('cfg-apiKey').value.trim(),
+    authDomain: document.getElementById('cfg-authDomain').value.trim(),
+    databaseURL: document.getElementById('cfg-databaseURL').value.trim(),
+    projectId: document.getElementById('cfg-projectId').value.trim()
+  };
+  if (!config.apiKey || !config.authDomain || !config.databaseURL || !config.projectId) {
+    document.getElementById('setup-error').textContent = 'Preencha todos os campos.';
+    return;
+  }
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+  location.reload();
+}
+
+function initFirebase(config) {
+  try {
+    firebase.initializeApp(config);
+    auth = firebase.auth();
+    db = firebase.database();
+    return true;
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    return false;
+  }
+}
+
+// ======================== AUTH ========================
+function loginWithGoogle() {
+  document.getElementById('login-loading').style.display = 'block';
+  document.getElementById('login-error').textContent = '';
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err => {
+    document.getElementById('login-loading').style.display = 'none';
+    document.getElementById('login-error').textContent = 'Erro: ' + err.message;
+  });
+}
+
+function logout() {
+  auth.signOut();
+}
+
+function onAuthStateChanged(user) {
+  if (user) {
+    currentUser = { uid: user.uid, name: user.displayName, email: user.email, photo: user.photoURL };
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    // Save user to DB
+    db.ref('users/' + user.uid).update({
+      name: user.displayName,
+      email: user.email,
+      photo: user.photoURL,
+      lastSeen: firebase.database.ServerValue.TIMESTAMP
+    });
+    // Set presence
+    const presRef = db.ref('presence/' + user.uid);
+    presRef.set({ name: user.displayName, photo: user.photoURL, online: true });
+    presRef.onDisconnect().remove();
+    setupListeners();
+    renderUserBar();
+  } else {
+    currentUser = null;
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').classList.remove('visible');
+  }
+}
+
+function renderUserBar() {
+  if (!currentUser) return;
+  document.getElementById('user-bar').innerHTML = `
+    <img class="user-avatar" src="${currentUser.photo || ''}" alt="" onerror="this.style.display='none'">
+    <div class="user-info">
+      <div class="user-name">${currentUser.name}</div>
+      <div class="user-role">${usersData[currentUser.uid]?.role || 'membro'}</div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sair</button>
+  `;
+}
+
+// ======================== REALTIME LISTENERS ========================
+function setupListeners() {
+  // Projects
+  db.ref('projects').on('value', snap => {
+    const val = snap.val();
+    if (!val) {
+      // First time — seed with defaults
+      db.ref('projects').set(DEFAULT_PROJECTS);
+      return;
+    }
+    projectsData = val;
+    refreshCurrentView();
+  });
+  // Users
+  db.ref('users').on('value', snap => {
+    usersData = snap.val() || {};
+    // Set first user as admin if no admin exists
+    const hasAdmin = Object.values(usersData).some(u => u.role === 'admin');
+    if (!hasAdmin && currentUser && usersData[currentUser.uid]) {
+      db.ref('users/' + currentUser.uid + '/role').set('admin');
+    }
+    refreshCurrentView();
+    renderUserBar();
+  });
+  // Activity
+  db.ref('activity').orderByChild('ts').limitToLast(50).on('value', snap => {
+    activityData = [];
+    snap.forEach(c => activityData.unshift({ ...c.val(), key: c.key }));
+    if (currentView === 'activity') showActivity();
+  });
+  // Presence
+  db.ref('presence').on('value', snap => {
+    renderOnlineUsers(snap.val() || {});
+  });
+}
+
+function renderOnlineUsers(presence) {
+  const container = document.getElementById('online-users');
+  const uids = Object.keys(presence);
+  if (uids.length === 0) { container.innerHTML = ''; return; }
+  let html = uids.slice(0, 5).map(uid => {
+    const p = presence[uid];
+    return `<img class="online-dot" src="${p.photo||''}" title="${p.name}" onerror="this.style.display='none'">`;
+  }).join('');
+  if (uids.length > 5) html += `<span class="online-count">+${uids.length-5}</span>`;
+  container.innerHTML = html;
+}
+
+function logActivity(action, detail) {
+  if (!currentUser) return;
+  db.ref('activity').push({
+    uid: currentUser.uid,
+    name: currentUser.name,
+    photo: currentUser.photo,
+    action, detail,
+    ts: firebase.database.ServerValue.TIMESTAMP
+  });
+}
+
+// ======================== STATS ========================
+function projectStats(proj) {
+  let total=0,done=0;
+  (proj.phases||[]).forEach(ph => (ph.weeks||[]).forEach(w => (w.tasks||[]).forEach(t => { total++; if(t.done) done++; })));
+  return {total,done,pct:total?Math.round(done/total*100):0};
+}
+function phaseStats(phase) {
+  let total=0,done=0;
+  (phase.weeks||[]).forEach(w => (w.tasks||[]).forEach(t => { total++; if(t.done) done++; }));
+  return {total,done,pct:total?Math.round(done/total*100):0};
+}
+function weekStats(week) {
+  const tasks = week.tasks||[];
+  let total=tasks.length,done=tasks.filter(t=>t.done).length;
+  return {total,done,pct:total?Math.round(done/total*100):0};
+}
+function globalStats() {
+  let total=0,done=0;
+  Object.values(projectsData).forEach(p => { const s=projectStats(p); total+=s.total; done+=s.done; });
+  return {total,done,pct:total?Math.round(done/total*100):0};
+}
+
+// ======================== NAVIGATION ========================
+function refreshCurrentView() {
+  renderSidebar();
+  if (currentView === 'dashboard') showDashboard();
+  else if (currentView === 'project' && currentProject) showProject(currentProject);
+  else if (currentView === 'team') showTeam();
+  else if (currentView === 'activity') showActivity();
+}
+
+function renderSidebar() {
+  const container = document.getElementById('sidebar-projects');
+  container.innerHTML = Object.entries(projectsData).map(([id,p]) => {
+    const s = projectStats(p);
+    const active = currentView==='project' && currentProject===id;
+    return `<button class="nav-item ${active?'active':''}" onclick="showProject('${id}')">
+      <span class="nav-dot" style="background:${p.color}"></span>
+      <span>${p.name}</span>
+      <span class="nav-count">${s.pct}%</span>
+    </button>`;
+  }).join('');
+  document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === currentView);
+  });
+}
+
+// ======================== DASHBOARD ========================
+function showDashboard() {
+  currentView = 'dashboard'; currentProject = null;
+  document.getElementById('topbar-title').textContent = 'Dashboard';
+  document.getElementById('topbar-badge').style.display = 'none';
+  document.getElementById('topbar-actions').innerHTML = '';
+  renderSidebar();
+  const gs = globalStats();
+  const projEntries = Object.entries(projectsData);
+  let html = `
+    <div style="margin-bottom:24px;padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-weight:600">Progresso Geral</span>
+        <span style="font-size:24px;font-weight:700;color:var(--green)">${gs.pct}%</span>
+      </div>
+      <div style="height:8px;background:var(--bg);border-radius:8px;overflow:hidden">
+        <div style="height:100%;width:${gs.pct}%;background:var(--green);border-radius:8px;transition:width 0.5s"></div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-top:6px">${gs.done} de ${gs.total} tarefas em ${projEntries.length} empresas</div>
+    </div>
+    <div class="dashboard-grid">${projEntries.map(([id,p]) => {
+      const s = projectStats(p);
+      return `<div class="dash-card" onclick="showProject('${id}')">
+        <div class="dash-card-header"><span class="dash-card-name">${p.name}</span><span class="dash-card-icon">${p.icon}</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${p.description||''}</div>
+        <div class="dash-progress-bar"><div class="dash-progress-fill" style="width:${s.pct}%;background:${p.color}"></div></div>
+        <div class="dash-card-stats"><span><strong>${s.done}</strong>/${s.total} tarefas</span><span style="color:${p.color};font-weight:600">${s.pct}%</span></div>
+      </div>`;
+    }).join('')}</div>`;
+  document.getElementById('content').innerHTML = html;
+}
+
+// ======================== TEAM ========================
+function showTeam() {
+  currentView = 'team'; currentProject = null;
+  document.getElementById('topbar-title').textContent = 'Equipe';
+  document.getElementById('topbar-badge').style.display = 'none';
+  document.getElementById('topbar-actions').innerHTML = '';
+  renderSidebar();
+  const users = Object.entries(usersData);
+  // Count tasks per user
+  const taskCounts = {};
+  Object.values(projectsData).forEach(p =>
+    (p.phases||[]).forEach(ph => (ph.weeks||[]).forEach(w => (w.tasks||[]).forEach(t => {
+      if (t.assignee) {
+        if (!taskCounts[t.assignee]) taskCounts[t.assignee] = {total:0,done:0};
+        taskCounts[t.assignee].total++;
+        if (t.done) taskCounts[t.assignee].done++;
+      }
+    })))
+  );
+  const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
+  let html = `<h3 style="margin-bottom:16px;font-size:16px">${users.length} membros</h3>
+    <div class="team-grid">${users.map(([uid,u]) => {
+      const tc = taskCounts[uid] || {total:0,done:0};
+      return `<div class="team-card">
+        <img class="team-avatar" src="${u.photo||''}" alt="" onerror="this.style.background='var(--bg4)'">
+        <div>
+          <div class="team-name">${u.name}</div>
+          <div class="team-tasks">${tc.done}/${tc.total} tarefas</div>
+          <span class="team-role-badge" style="background:${u.role==='admin'?'var(--orange-bg)':'var(--blue-bg)'};color:${u.role==='admin'?'var(--orange)':'var(--blue)'}">
+            ${u.role||'membro'}
+          </span>
+          ${isAdmin && uid !== currentUser.uid ? `<button class="task-action-btn" style="margin-top:4px;font-size:10px" onclick="toggleRole('${uid}','${u.role==='admin'?'membro':'admin'}')">${u.role==='admin'?'Remover admin':'Tornar admin'}</button>` : ''}
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  document.getElementById('content').innerHTML = html;
+}
+
+function toggleRole(uid, newRole) {
+  db.ref('users/' + uid + '/role').set(newRole);
+  logActivity('role', `Alterou papel de ${usersData[uid]?.name} para ${newRole}`);
+}
+
+// ======================== ACTIVITY ========================
+function showActivity() {
+  currentView = 'activity'; currentProject = null;
+  document.getElementById('topbar-title').textContent = 'Atividades';
+  document.getElementById('topbar-badge').style.display = 'none';
+  document.getElementById('topbar-actions').innerHTML = '';
+  renderSidebar();
+  let html = '<div class="activity-log">';
+  if (activityData.length === 0) {
+    html += '<div style="text-align:center;padding:40px;color:var(--text3)">Nenhuma atividade ainda.</div>';
+  } else {
+    activityData.forEach(a => {
+      const time = a.ts ? new Date(a.ts).toLocaleString('pt-BR') : '';
+      html += `<div class="activity-item">
+        <img class="activity-avatar" src="${a.photo||''}" alt="" onerror="this.style.display='none'">
+        <div><div class="activity-text"><strong>${a.name}</strong> ${a.action} ${a.detail||''}</div>
+        <div class="activity-time">${time}</div></div>
+      </div>`;
+    });
+  }
+  html += '</div>';
+  document.getElementById('content').innerHTML = html;
+}
+
+// ======================== PROJECT VIEW ========================
+function showProject(projectId) {
+  currentView = 'project'; currentProject = projectId;
+  const proj = projectsData[projectId];
+  if (!proj) return;
+  const phases = proj.phases || [];
+  if (currentPhase >= phases.length) currentPhase = 0;
+  document.getElementById('topbar-title').textContent = (proj.icon||'') + ' ' + proj.name;
+  const s = projectStats(proj);
+  const badge = document.getElementById('topbar-badge');
+  badge.style.display = 'inline';
+  badge.textContent = s.pct + '% completo';
+  badge.style.background = (proj.color||'#3b82f6') + '22';
+  badge.style.color = proj.color;
+  const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
+  document.getElementById('topbar-actions').innerHTML = isAdmin ?
+    `<button class="view-btn" onclick="openAddPhaseModal()">+ Fase</button>
+     <button class="view-btn" onclick="openEditProjectModal('${projectId}')">Editar</button>` : '';
+  renderSidebar();
+  renderProjectContent(proj, projectId);
+}
+
+function renderProjectContent(proj, projectId) {
+  const phases = proj.phases || [];
+  const phase = phases[currentPhase];
+  if (!phase) return;
+  let html = `<div class="phase-tabs">${phases.map((ph,idx) => {
+    const ps = phaseStats(ph);
+    return `<button class="phase-tab ${idx===currentPhase?'active':''}"
+      style="${idx===currentPhase?'background:'+(proj.color||'#3b82f6')+';border-color:transparent;':''}"
+      onclick="setPhase(${idx})">${ph.name} (${ps.pct}%)</button>`;
+  }).join('')}</div>
+  <div style="margin-bottom:16px;padding:14px 16px;background:${proj.color||'#3b82f6'}15;border:1px solid ${proj.color||'#3b82f6'}33;border-radius:var(--radius)">
+    <div style="font-weight:600;font-size:14px;color:${proj.color}">${phase.name}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:2px">${phase.description||''}</div>
+  </div>`;
+
+  (phase.weeks||[]).forEach((week,wIdx) => {
+    const ws = weekStats(week);
+    html += `<div class="week-group" id="wg-${wIdx}">
+      <div class="week-group-header" onclick="toggleWG(${wIdx})">
+        <div class="wg-left">
+          <span class="wg-label">${week.num||''}</span>
+          <div><div class="wg-title">${week.title||''}</div>
+          <div class="wg-dates">${week.dates||''}${week.resp?' · '+week.resp:''}</div></div>
+        </div>
+        <div class="wg-right">
+          <div class="wg-progress"><div class="wg-progress-fill" style="width:${ws.pct}%;background:${proj.color||'var(--green)'}"></div></div>
+          <span class="wg-count">${ws.done}/${ws.total}</span>
+          <span class="wg-chevron">▾</span>
+        </div>
+      </div>
+      <div class="week-group-body">
+        <div class="wg-meta">
+          ${week.resp?`<span class="wg-meta-tag wg-meta-resp">${week.resp}</span>`:''}
+          ${week.tools?`<span class="wg-meta-tag wg-meta-tools">${week.tools}</span>`:''}
+        </div>
+        ${(week.tasks||[]).map((task,tIdx) => {
+          const assignee = task.assignee && usersData[task.assignee] ? usersData[task.assignee] : null;
+          const doneByUser = task.doneBy && usersData[task.doneBy] ? usersData[task.doneBy] : null;
+          return `<div class="task-row ${task.done?'done':''}" id="task-${wIdx}-${tIdx}">
+            <input type="checkbox" class="task-checkbox" ${task.done?'checked':''} onchange="toggleTaskDone('${projectId}',${currentPhase},${wIdx},${tIdx})">
+            <div class="task-content">
+              <div class="task-text">${task.text||''}</div>
+              <div class="task-meta-row">
+                ${assignee ?
+                  `<span class="task-assignee" onclick="openAssigneeDropdown(event,'${projectId}',${currentPhase},${wIdx},${tIdx})">
+                    <img src="${assignee.photo||''}"> ${assignee.name}
+                  </span>` :
+                  `<span class="task-assignee-placeholder" onclick="openAssigneeDropdown(event,'${projectId}',${currentPhase},${wIdx},${tIdx})">+ atribuir</span>`
+                }
+                <button class="task-notes-toggle ${task.notes?'has-notes':''}" onclick="toggleNotes(${wIdx},${tIdx})">
+                  ${task.notes?'📝 notas':'+ notas'}
+                </button>
+                ${doneByUser ? `<span class="task-done-by">✓ por ${doneByUser.name}</span>` : ''}
+              </div>
+              <div class="task-notes-area" id="notes-${wIdx}-${tIdx}">
+                <textarea class="task-notes-input" placeholder="Notas, links, observações..."
+                  onblur="saveNotes('${projectId}',${currentPhase},${wIdx},${tIdx},this.value)">${task.notes||''}</textarea>
+              </div>
+            </div>
+            <div class="task-actions">
+              <button class="task-action-btn delete" onclick="deleteTask('${projectId}',${currentPhase},${wIdx},${tIdx})" title="Remover">✕</button>
+            </div>
+          </div>`;
+        }).join('')}
+        <div class="add-task-row">
+          <input class="add-task-input" id="new-task-${wIdx}" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')addTask('${projectId}',${currentPhase},${wIdx})">
+          <button class="add-task-submit" onclick="addTask('${projectId}',${currentPhase},${wIdx})">+</button>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
+  if (isAdmin) {
+    html += `<div style="text-align:center;margin-top:16px">
+      <button class="view-btn" onclick="openAddWeekModal('${projectId}',${currentPhase})" style="background:var(--bg2)">+ Adicionar Semana</button>
+    </div>`;
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+// ======================== TASK ACTIONS ========================
+function setPhase(idx) { currentPhase = idx; showProject(currentProject); }
+function toggleWG(idx) { document.getElementById('wg-'+idx)?.classList.toggle('open'); }
+function toggleNotes(wIdx,tIdx) { document.getElementById('notes-'+wIdx+'-'+tIdx)?.classList.toggle('open'); }
+
+function toggleTaskDone(projId,phaseIdx,wIdx,tIdx) {
+  const path = `projects/${projId}/phases/${phaseIdx}/weeks/${wIdx}/tasks/${tIdx}`;
+  const task = projectsData[projId]?.phases?.[phaseIdx]?.weeks?.[wIdx]?.tasks?.[tIdx];
+  if (!task) return;
+  const newDone = !task.done;
+  const updates = { [`${path}/done`]: newDone };
+  if (newDone) updates[`${path}/doneBy`] = currentUser.uid;
+  else updates[`${path}/doneBy`] = '';
+  db.ref().update(updates);
+  logActivity(newDone ? 'concluiu' : 'reabriu', `"${(task.text||'').substring(0,50)}" em ${projectsData[projId]?.name}`);
+}
+
+function saveNotes(projId,phaseIdx,wIdx,tIdx,value) {
+  db.ref(`projects/${projId}/phases/${phaseIdx}/weeks/${wIdx}/tasks/${tIdx}/notes`).set(value);
+}
+
+function addTask(projId,phaseIdx,wIdx) {
+  const input = document.getElementById('new-task-'+wIdx);
+  if (!input || !input.value.trim()) return;
+  const text = input.value.trim();
+  const tasksRef = db.ref(`projects/${projId}/phases/${phaseIdx}/weeks/${wIdx}/tasks`);
+  tasksRef.once('value', snap => {
+    const tasks = snap.val() || [];
+    tasks.push({text,done:false,notes:'',assignee:'',doneBy:''});
+    tasksRef.set(tasks);
+    logActivity('adicionou', `"${text.substring(0,50)}" em ${projectsData[projId]?.name}`);
+  });
+}
+
+function deleteTask(projId,phaseIdx,wIdx,tIdx) {
+  const task = projectsData[projId]?.phases?.[phaseIdx]?.weeks?.[wIdx]?.tasks?.[tIdx];
+  if (!confirm('Remover esta tarefa?')) return;
+  const tasksRef = db.ref(`projects/${projId}/phases/${phaseIdx}/weeks/${wIdx}/tasks`);
+  tasksRef.once('value', snap => {
+    const tasks = snap.val() || [];
+    tasks.splice(tIdx, 1);
+    tasksRef.set(tasks);
+    logActivity('removeu', `"${(task?.text||'').substring(0,50)}" de ${projectsData[projId]?.name}`);
+  });
+}
+
+// ======================== ASSIGNEE DROPDOWN ========================
+function openAssigneeDropdown(event, projId, phaseIdx, wIdx, tIdx) {
+  event.stopPropagation();
+  closeAssigneeDropdown();
+  const rect = event.target.getBoundingClientRect();
+  const dd = document.createElement('div');
+  dd.className = 'assignee-dropdown';
+  dd.style.top = (rect.bottom + 4) + 'px';
+  dd.style.left = rect.left + 'px';
+  dd.style.position = 'fixed';
+
+  const task = projectsData[projId]?.phases?.[phaseIdx]?.weeks?.[wIdx]?.tasks?.[tIdx];
+  let html = '';
+  Object.entries(usersData).forEach(([uid,u]) => {
+    html += `<button class="assignee-option" onclick="assignTask('${projId}',${phaseIdx},${wIdx},${tIdx},'${uid}')">
+      <img src="${u.photo||''}" onerror="this.style.display='none'"> ${u.name}
+    </button>`;
+  });
+  if (task?.assignee) {
+    html += `<button class="assignee-option remove" onclick="assignTask('${projId}',${phaseIdx},${wIdx},${tIdx},'')">✕ Remover atribuição</button>`;
+  }
+  dd.innerHTML = html;
+  document.body.appendChild(dd);
+  assigneeDropdownEl = dd;
+  setTimeout(() => document.addEventListener('click', closeAssigneeDropdown, {once:true}), 10);
+}
+
+function closeAssigneeDropdown() {
+  if (assigneeDropdownEl) { assigneeDropdownEl.remove(); assigneeDropdownEl = null; }
+}
+
+function assignTask(projId, phaseIdx, wIdx, tIdx, uid) {
+  db.ref(`projects/${projId}/phases/${phaseIdx}/weeks/${wIdx}/tasks/${tIdx}/assignee`).set(uid);
+  closeAssigneeDropdown();
+  const task = projectsData[projId]?.phases?.[phaseIdx]?.weeks?.[wIdx]?.tasks?.[tIdx];
+  if (uid) {
+    logActivity('atribuiu', `"${(task?.text||'').substring(0,50)}" para ${usersData[uid]?.name}`);
+  }
+}
+
+// ======================== MODALS ========================
+function openModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+function openNewProjectModal() {
+  openModal(`<h3>Nova Empresa / Projeto</h3>
+    <div class="modal-field"><label class="modal-label">Nome</label><input class="modal-input" id="np-name" placeholder="Ex: MinhaEmpresa"></div>
+    <div class="modal-field"><label class="modal-label">Descrição</label><input class="modal-input" id="np-desc" placeholder="Segmento da empresa"></div>
+    <div class="modal-field"><label class="modal-label">Ícone (emoji)</label><input class="modal-input" id="np-icon" placeholder="🏢" maxlength="4" value="🏢"></div>
+    <div class="modal-field"><label class="modal-label">Cor</label>
+      <div class="color-options" id="np-colors">${COLORS.map((c,i)=>`<div class="color-opt ${i===0?'selected':''}" style="background:${c}" data-color="${c}" onclick="selectColor(this)"></div>`).join('')}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn modal-btn-confirm" onclick="createProject()">Criar</button>
+    </div>`);
+}
+
+function selectColor(el) { el.parentElement.querySelectorAll('.color-opt').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); }
+
+function createProject() {
+  const name = document.getElementById('np-name').value.trim();
+  if (!name) return;
+  const id = name.toLowerCase().replace(/[^a-z0-9]/g,'-') + '-' + Date.now();
+  const proj = {
+    name, description: document.getElementById('np-desc').value.trim(),
+    icon: document.getElementById('np-icon').value.trim()||'🏢',
+    color: document.querySelector('#np-colors .selected')?.dataset.color || COLORS[0],
+    phases: [{name:'Fase 1',description:'Primeira fase.',weeks:[
+      {num:'Sem 1',title:'Início',dates:'A definir',resp:'',tools:'',tasks:[{text:'Primeira tarefa',done:false,notes:'',assignee:'',doneBy:''}]}
+    ]}]
+  };
+  db.ref('projects/' + id).set(proj);
+  logActivity('criou', `o projeto "${name}"`);
+  closeModal();
+  showProject(id);
+}
+
+function openEditProjectModal(projId) {
+  const proj = projectsData[projId];
+  if (!proj) return;
+  openModal(`<h3>Editar Empresa</h3>
+    <div class="modal-field"><label class="modal-label">Nome</label><input class="modal-input" id="ep-name" value="${proj.name}"></div>
+    <div class="modal-field"><label class="modal-label">Descrição</label><input class="modal-input" id="ep-desc" value="${proj.description||''}"></div>
+    <div class="modal-field"><label class="modal-label">Ícone</label><input class="modal-input" id="ep-icon" value="${proj.icon||''}" maxlength="4"></div>
+    <div class="modal-field"><label class="modal-label">Cor</label>
+      <div class="color-options" id="ep-colors">${COLORS.map(c=>`<div class="color-opt ${c===proj.color?'selected':''}" style="background:${c}" data-color="${c}" onclick="selectColor(this)"></div>`).join('')}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" style="background:var(--red-bg);color:var(--red);margin-right:auto" onclick="deleteProject('${projId}')">Excluir</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn modal-btn-confirm" onclick="saveProjectEdit('${projId}')">Salvar</button>
+    </div>`);
+}
+
+function saveProjectEdit(projId) {
+  db.ref('projects/'+projId).update({
+    name: document.getElementById('ep-name').value.trim(),
+    description: document.getElementById('ep-desc').value.trim(),
+    icon: document.getElementById('ep-icon').value.trim(),
+    color: document.querySelector('#ep-colors .selected')?.dataset.color
+  });
+  closeModal(); showProject(projId);
+}
+
+function deleteProject(projId) {
+  if (!confirm('Excluir esta empresa e todas as tarefas?')) return;
+  db.ref('projects/'+projId).remove();
+  logActivity('excluiu', `o projeto "${projectsData[projId]?.name}"`);
+  closeModal(); showDashboard();
+}
+
+function openAddPhaseModal() {
+  openModal(`<h3>Nova Fase</h3>
+    <div class="modal-field"><label class="modal-label">Nome</label><input class="modal-input" id="aph-name" placeholder="Ex: Fase 2 — Crescimento"></div>
+    <div class="modal-field"><label class="modal-label">Descrição</label><input class="modal-input" id="aph-desc" placeholder="Objetivo da fase"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn modal-btn-confirm" onclick="addPhase()">Criar</button>
+    </div>`);
+}
+
+function addPhase() {
+  const proj = projectsData[currentProject];
+  if (!proj) return;
+  const phases = proj.phases || [];
+  phases.push({
+    name: document.getElementById('aph-name').value.trim()||'Nova Fase',
+    description: document.getElementById('aph-desc').value.trim(),
+    weeks: [{num:'Sem 1',title:'Início',dates:'A definir',resp:'',tools:'',tasks:[{text:'Primeira tarefa',done:false,notes:'',assignee:'',doneBy:''}]}]
+  });
+  db.ref('projects/'+currentProject+'/phases').set(phases);
+  closeModal(); currentPhase = phases.length - 1; showProject(currentProject);
+}
+
+function openAddWeekModal(projId, phaseIdx) {
+  openModal(`<h3>Nova Semana</h3>
+    <div class="modal-field"><label class="modal-label">Identificador</label><input class="modal-input" id="aw-num" placeholder="Ex: Sem 5"></div>
+    <div class="modal-field"><label class="modal-label">Título</label><input class="modal-input" id="aw-title" placeholder="Ex: Implementação do CRM"></div>
+    <div class="modal-field"><label class="modal-label">Datas</label><input class="modal-input" id="aw-dates" placeholder="Ex: 12–16 Mai 2026"></div>
+    <div class="modal-field"><label class="modal-label">Responsável</label><input class="modal-input" id="aw-resp" placeholder="Ex: Você + Claude"></div>
+    <div class="modal-field"><label class="modal-label">Ferramentas</label><input class="modal-input" id="aw-tools" placeholder="Ex: Claude, Google Sheets"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn modal-btn-confirm" onclick="addWeek('${projId}',${phaseIdx})">Criar</button>
+    </div>`);
+}
+
+function addWeek(projId, phaseIdx) {
+  const weeks = projectsData[projId]?.phases?.[phaseIdx]?.weeks || [];
+  weeks.push({
+    num: document.getElementById('aw-num').value.trim()||'Novo',
+    title: document.getElementById('aw-title').value.trim()||'Nova Semana',
+    dates: document.getElementById('aw-dates').value.trim()||'A definir',
+    resp: document.getElementById('aw-resp').value.trim(),
+    tools: document.getElementById('aw-tools').value.trim(),
+    tasks: [{text:'Primeira tarefa',done:false,notes:'',assignee:'',doneBy:''}]
+  });
+  db.ref(`projects/${projId}/phases/${phaseIdx}/weeks`).set(weeks);
+  closeModal(); showProject(projId);
+}
+
+// ======================== INIT ========================
+(function init() {
+  const config = getSavedConfig();
+  if (!config) {
+    document.getElementById('setup-screen').classList.add('visible');
+    return;
+  }
+  if (!initFirebase(config)) {
+    localStorage.removeItem(CONFIG_KEY);
+    document.getElementById('setup-screen').classList.add('visible');
+    return;
+  }
+  document.getElementById('login-screen').style.display = 'flex';
+  auth.onAuthStateChanged(onAuthStateChanged);
+})();
+</script>
+</body>
+</html>
