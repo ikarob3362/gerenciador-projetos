@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerenciador de Projetos — Ikaro</title>
+<title>Gerenciador de Projetos — Ikaro v3</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
 
 <!-- Firebase SDKs -->
@@ -12,7 +12,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
 <style>
-/* THEME VARIABLES */
+/* ======================== THEME VARIABLES ======================== */
 :root {
   --bg: #0f1117; --bg2: #1a1d27; --bg3: #242733; --bg4: #2e3142;
   --border: #353849; --text: #e4e5eb; --text2: #9ba1b0; --text3: #6b7185;
@@ -25,7 +25,6 @@
   --radius: 10px; --shadow: 0 2px 8px rgba(0,0,0,0.3); --transition: all 0.2s ease;
 }
 
-/* LIGHT THEME */
 [data-theme="light"] {
   --bg: #f5f6fa; --bg2: #ffffff; --bg3: #eef0f4; --bg4: #dfe2ea;
   --border: #d5d8e0; --text: #1a1d27; --text2: #5a6070; --text3: #8a90a0;
@@ -38,12 +37,13 @@
   --shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
+/* ======================== RESET & BASE ======================== */
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;overflow:hidden;height:100vh}
 button{cursor:pointer;border:none;font-family:inherit}
 input,textarea,select{font-family:inherit}
 
-/* LOGIN SCREEN */
+/* ======================== LOGIN & AUTH ======================== */
 .login-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,var(--bg) 0%,#1e293b 50%,var(--bg) 100%)}
 .login-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;width:400px;max-width:90vw}
 .login-card h1{font-size:28px;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:10px}
@@ -54,20 +54,18 @@ input,textarea,select{font-family:inherit}
 .login-error{color:var(--red);font-size:12px;margin-top:12px}
 .login-loading{color:var(--text3);font-size:13px;margin-top:16px}
 
-/* APPROVAL SCREEN */
 .approval-screen{display:none;align-items:center;justify-content:center;height:100vh;background:var(--bg)}
 .approval-screen.visible{display:flex}
 .approval-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;width:400px;max-width:90vw}
 .approval-card h2{font-size:24px;margin-bottom:16px}
 .approval-card p{color:var(--text2);font-size:14px;margin-bottom:32px;line-height:1.6}
 .approval-card .status-icon{font-size:48px;margin-bottom:16px}
-.approval-denied{color:var(--red);font-weight:600;margin-bottom:16px}
 
-/* APP LAYOUT */
+/* ======================== APP LAYOUT ======================== */
 .app{display:none;height:100vh}
 .app.visible{display:flex}
 
-/* SIDEBAR */
+/* ======================== SIDEBAR ======================== */
 .sidebar{width:280px;min-width:280px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
 .sidebar-logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
@@ -84,7 +82,7 @@ input,textarea,select{font-family:inherit}
 .add-project-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;margin:2px 8px;border-radius:8px;font-size:13px;color:var(--text3);background:transparent;width:calc(100% - 16px);text-align:left;transition:var(--transition)}
 .add-project-btn:hover{background:var(--bg3);color:var(--green)}
 
-/* USER BAR */
+/* User bar */
 .user-bar{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
 .user-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover}
 .user-info{flex:1;min-width:0}
@@ -95,10 +93,17 @@ input,textarea,select{font-family:inherit}
 .logout-btn{padding:6px 10px;border-radius:6px;font-size:11px;background:var(--bg3);color:var(--text3);transition:var(--transition)}
 .logout-btn:hover{background:var(--red-bg);color:var(--red)}
 
-/* MAIN */
+/* ======================== MOBILE DRAWER ======================== */
+.hamburger-btn{display:none;width:40px;height:40px;padding:8px;margin-right:12px;background:var(--bg3);border-radius:8px;color:var(--text);font-size:20px}
+.hamburger-btn:hover{background:var(--bg4)}
+
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999}
+.sidebar-overlay.open{display:block}
+
+/* ======================== MAIN AREA ======================== */
 .main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
-/* TOPBAR */
+/* ======================== TOPBAR ======================== */
 .topbar{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
 .topbar-left{display:flex;align-items:center;gap:12px}
 .topbar-title{font-size:18px;font-weight:700}
@@ -108,16 +113,15 @@ input,textarea,select{font-family:inherit}
 .view-btn:hover{background:var(--bg4);color:var(--text)}
 .view-btn.active{background:var(--blue);color:white}
 
-/* ONLINE USERS */
 .online-users{display:flex;align-items:center;gap:-4px;margin-right:8px}
 .online-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--bg2);margin-left:-8px;object-fit:cover;position:relative}
 .online-dot:first-child{margin-left:0}
 .online-count{font-size:11px;color:var(--text3);margin-left:4px}
 
-/* CONTENT */
+/* ======================== CONTENT ======================== */
 .content{flex:1;overflow-y:auto;padding:24px}
 
-/* DASHBOARD */
+/* ======================== DASHBOARD ======================== */
 .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:24px}
 .dash-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:var(--transition)}
 .dash-card:hover{border-color:var(--text3);transform:translateY(-2px)}
@@ -129,7 +133,7 @@ input,textarea,select{font-family:inherit}
 .dash-card-stats{display:flex;justify-content:space-between;font-size:12px;color:var(--text3)}
 .dash-card-stats strong{color:var(--text)}
 
-/* TEAM SECTION */
+/* ======================== TEAM ======================== */
 .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
 .team-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:12px}
 .team-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
@@ -145,13 +149,13 @@ input,textarea,select{font-family:inherit}
 .team-action-btn.reject{background:var(--red-bg);color:var(--red)}
 .team-action-btn.reject:hover{background:var(--red);color:white}
 
-/* PHASE TABS */
-.phase-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
-.phase-tab{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;background:var(--bg2);color:var(--text2);border:1px solid var(--border);transition:var(--transition)}
+/* ======================== PHASE TABS ======================== */
+.phase-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;overflow-x:auto}
+.phase-tab{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;background:var(--bg2);color:var(--text2);border:1px solid var(--border);transition:var(--transition);white-space:nowrap}
 .phase-tab:hover{border-color:var(--text3)}
 .phase-tab.active{color:white;border-color:transparent}
 
-/* WEEK GROUP */
+/* ======================== WEEK GROUP ======================== */
 .week-group{margin-bottom:16px}
 .week-group-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:var(--transition);user-select:none}
 .week-group-header:hover{border-color:var(--text3)}
@@ -173,7 +177,7 @@ input,textarea,select{font-family:inherit}
 .wg-meta-resp{background:var(--blue-bg);color:var(--blue)}
 .wg-meta-tools{background:var(--orange-bg);color:var(--orange)}
 
-/* TASK ITEM */
+/* ======================== PROJECT TASKS ======================== */
 .task-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;transition:var(--transition)}
 .task-row:hover{background:var(--bg3)}
 .task-row.done{opacity:0.5}
@@ -208,7 +212,6 @@ input,textarea,select{font-family:inherit}
 .task-action-btn:hover{background:var(--bg);color:var(--text)}
 .task-action-btn.delete:hover{color:var(--red)}
 
-/* ADD TASK */
 .add-task-row{display:flex;gap:8px;padding:8px 12px;margin-top:4px}
 .add-task-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);outline:none}
 .add-task-input:focus{border-color:var(--green)}
@@ -216,22 +219,56 @@ input,textarea,select{font-family:inherit}
 .add-task-submit{padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;background:var(--green);color:white;transition:var(--transition)}
 .add-task-submit:hover{opacity:0.85}
 
-/* ASSIGNEE DROPDOWN */
 .assignee-dropdown{position:absolute;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:4px;z-index:200;min-width:180px;box-shadow:var(--shadow)}
 .assignee-option{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:12px;transition:var(--transition);background:none;width:100%;text-align:left;color:var(--text)}
 .assignee-option:hover{background:var(--bg3)}
 .assignee-option img{width:20px;height:20px;border-radius:50%}
 .assignee-option.remove{color:var(--red)}
 
-/* MODAL */
+/* ======================== KANBAN / TAREFAS ======================== */
+.kanban-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:20px}
+.kanban-column{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column}
+.kanban-header{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.kanban-title{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}
+.kanban-count{font-size:11px;color:var(--text3);background:var(--bg);padding:2px 8px;border-radius:10px}
+.kanban-cards{flex:1;overflow-y:auto;padding:12px;min-height:400px}
+.task-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;cursor:pointer;transition:var(--transition);display:flex;flex-direction:column;gap:10px}
+.task-card:hover{border-color:var(--text3);transform:translateY(-2px);box-shadow:var(--shadow)}
+.task-card.editing{border-color:var(--blue);background:var(--bg3)}
+.card-title{font-weight:600;font-size:13px;color:var(--text)}
+.card-description{font-size:11px;color:var(--text3);line-height:1.4}
+.card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
+.card-avatar-placeholder{width:24px;height:24px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3)}
+.card-priority{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.card-priority.urgente{background:var(--red-bg);color:var(--red)}
+.card-priority.alta{background:var(--orange-bg);color:var(--orange)}
+.card-priority.media{background:var(--yellow);color:#333}
+.card-priority.baixa{background:var(--green-bg);color:var(--green)}
+.card-company{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--purple-bg);color:var(--purple)}
+.card-duedate{font-size:10px;color:var(--text3)}
+.card-actions{display:flex;gap:4px;margin-top:4px}
+.card-btn{padding:4px 8px;font-size:10px;border-radius:4px;background:var(--bg3);color:var(--text3);transition:var(--transition)}
+.card-btn:hover{background:var(--bg4);color:var(--text)}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:var(--text3);text-align:center;min-height:200px}
+.empty-state-emoji{font-size:48px;margin-bottom:12px}
+.empty-state-text{font-size:13px}
+
+/* ======================== FLOATING ACTION BUTTON ======================== */
+.fab{display:none;position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:var(--green);color:white;font-size:24px;justify-content:center;align-items:center;cursor:pointer;box-shadow:var(--shadow);z-index:100;transition:var(--transition)}
+.fab:hover{transform:scale(1.1)}
+
+/* ======================== MODAL ======================== */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;width:480px;max-width:90vw;max-height:80vh;overflow-y:auto}
 .modal h3{font-size:16px;margin-bottom:16px}
 .modal-field{margin-bottom:14px}
 .modal-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block}
-.modal-input,.modal-select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);outline:none}
-.modal-input:focus,.modal-select:focus{border-color:var(--blue)}
+.modal-input,.modal-select,.modal-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit}
+.modal-input:focus,.modal-select:focus,.modal-textarea:focus{border-color:var(--blue)}
+.modal-textarea{resize:vertical;min-height:80px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
 .modal-btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;transition:var(--transition)}
 .modal-btn-cancel{background:var(--bg3);color:var(--text2)}
@@ -243,7 +280,7 @@ input,textarea,select{font-family:inherit}
 .color-opt:hover{transform:scale(1.15)}
 .color-opt.selected{border-color:white}
 
-/* PERMISSIONS SECTION */
+/* ======================== PERMISSIONS ======================== */
 .permissions-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
 .permissions-title{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase}
 .permissions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
@@ -252,7 +289,7 @@ input,textarea,select{font-family:inherit}
 .permission-item label{font-size:12px;cursor:pointer;flex:1}
 .permission-role-select{width:70px;font-size:11px;padding:4px;border:1px solid var(--border);background:var(--bg);border-radius:4px;color:var(--text)}
 
-/* ACTIVITY LOG */
+/* ======================== ACTIVITY LOG ======================== */
 .activity-log{max-height:300px;overflow-y:auto}
 .activity-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
 .activity-item:last-child{border-bottom:none}
@@ -261,7 +298,7 @@ input,textarea,select{font-family:inherit}
 .activity-text strong{color:var(--text)}
 .activity-time{font-size:10px;color:var(--text3);margin-top:2px}
 
-/* SETUP SCREEN */
+/* ======================== SETUP SCREEN ======================== */
 .setup-screen{display:none;align-items:center;justify-content:center;height:100vh;background:var(--bg)}
 .setup-screen.visible{display:flex}
 .setup-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;width:560px;max-width:90vw}
@@ -277,16 +314,64 @@ input,textarea,select{font-family:inherit}
 .setup-help a{color:var(--blue)}
 .setup-help code{background:var(--bg);padding:1px 5px;border-radius:3px;font-size:11px}
 
-/* RESPONSIVE */
+/* ======================== RESPONSIVE ======================== */
 @media(max-width:768px){
-  .sidebar{width:60px;min-width:60px}
-  .sidebar-header span:last-child,.sidebar-section,.nav-item span:not(.nav-dot),.nav-count,.nav-badge,.sidebar-sub,.add-project-btn span,.user-info,.logout-btn,.theme-toggle-btn{display:none}
-  .nav-item{justify-content:center;padding:10px}
-  .add-project-btn{justify-content:center;padding:10px}
-  .user-bar{justify-content:center}
-  .content{padding:16px}
+  /* Hamburger button visible on mobile */
+  .hamburger-btn{display:flex}
+
+  /* Sidebar drawer behavior */
+  .sidebar{position:fixed;left:-300px;top:0;bottom:0;width:280px;z-index:1000;transition:left 0.3s ease;border-right:1px solid var(--border)}
+  .sidebar.open{left:0}
+
+  .sidebar-overlay{display:none}
+  .sidebar-overlay.open{display:block}
+
+  /* Main area takes full width */
+  .app{flex-direction:column}
+  .main-area{width:100%}
+
+  /* Topbar adjustments */
   .topbar{padding:12px 16px}
+  .topbar-title{font-size:16px}
+  .online-users{display:none}
+  .topbar-right{gap:4px}
+
+  /* Content padding */
+  .content{padding:16px}
+
+  /* Kanban stack vertically */
+  .kanban-board{grid-template-columns:1fr}
+
+  /* Task cards more spacious */
+  .task-card{padding:16px}
+
+  /* Dashboard full width */
+  .dashboard-grid{grid-template-columns:1fr}
+
+  /* Modal adjustments */
+  .modal{width:95vw;max-height:none;max-height:90vh}
+
+  /* FAB visible on mobile */
+  .fab{display:flex}
+
+  /* Touch-friendly sizing */
+  .task-row{padding:12px;min-height:44px}
+  .phase-tabs{overflow-x:auto}
 }
+
+@media(min-width:769px) and (max-width:1024px){
+  /* Tablet sizing */
+  .dashboard-grid{grid-template-columns:repeat(2,1fr)}
+  .kanban-board{grid-template-columns:repeat(2,1fr)}
+  .team-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+@media(min-width:1025px){
+  /* Desktop - normal sidebar */
+  .sidebar{position:relative;left:auto;width:280px}
+}
+
+/* Scrollbar styling */
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
@@ -295,7 +380,7 @@ input,textarea,select{font-family:inherit}
 </head>
 <body>
 
-<!-- SETUP SCREEN (first time only) -->
+<!-- ======================== SETUP SCREEN ======================== -->
 <div class="setup-screen" id="setup-screen">
   <div class="setup-card">
     <h2>🔧 Configuração Inicial</h2>
@@ -329,7 +414,7 @@ input,textarea,select{font-family:inherit}
   </div>
 </div>
 
-<!-- LOGIN SCREEN -->
+<!-- ======================== LOGIN SCREEN ======================== -->
 <div class="login-screen" id="login-screen" style="display:none">
   <div class="login-card">
     <h1><span>🚀</span> Gerenciador</h1>
@@ -343,7 +428,7 @@ input,textarea,select{font-family:inherit}
   </div>
 </div>
 
-<!-- APPROVAL SCREEN -->
+<!-- ======================== APPROVAL SCREEN ======================== -->
 <div class="approval-screen" id="approval-screen">
   <div class="approval-card">
     <div class="status-icon" id="approval-icon">⏳</div>
@@ -353,7 +438,7 @@ input,textarea,select{font-family:inherit}
   </div>
 </div>
 
-<!-- APP -->
+<!-- ======================== APP ======================== -->
 <div class="app" id="app">
   <div class="sidebar">
     <div class="sidebar-header">
@@ -365,6 +450,11 @@ input,textarea,select{font-family:inherit}
       <button class="nav-item active" data-view="dashboard" onclick="showDashboard()">
         <span class="nav-dot" style="background:var(--blue)"></span>
         <span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-view="tasks" onclick="showTasks()">
+        <span class="nav-dot" style="background:var(--green)"></span>
+        <span>Tarefas</span>
+        <span class="nav-count" id="task-nav-count" style="display:none">0</span>
       </button>
       <button class="nav-item" data-view="team" onclick="showTeam()">
         <span class="nav-dot" style="background:var(--cyan)"></span>
@@ -384,8 +474,12 @@ input,textarea,select{font-family:inherit}
     </div>
     <div class="user-bar" id="user-bar"></div>
   </div>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
   <div class="main-area">
     <div class="topbar">
+      <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
       <div class="topbar-left">
         <span class="topbar-title" id="topbar-title">Dashboard</span>
         <span class="topbar-badge" id="topbar-badge" style="display:none"></span>
@@ -397,9 +491,11 @@ input,textarea,select{font-family:inherit}
     </div>
     <div class="content" id="content"></div>
   </div>
+
+  <button class="fab" id="fab-new-task" onclick="openNewTaskModal()" title="Nova Tarefa">+</button>
 </div>
 
-<!-- MODAL -->
+<!-- ======================== MODAL ======================== -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal" id="modal-content"></div>
 </div>
@@ -409,10 +505,13 @@ input,textarea,select{font-family:inherit}
 const CONFIG_KEY = 'ikaro_pm_firebase_config';
 const THEME_KEY = 'ikaro_pm_theme';
 const COLORS = ['#22c55e','#3b82f6','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#f97316'];
+const COMPANIES = ['PLugo Eletropostos', 'SoluçõesUP', 'UpLink Serviço', 'UpLink Provedor'];
+const PRIORITIES = ['Urgente', 'Alta', 'Média', 'Baixa'];
 
 let db, auth, currentUser = null;
 let projectsData = {};
 let usersData = {};
+let tasksData = {};
 let activityData = [];
 let currentView = 'dashboard';
 let currentProject = null;
@@ -465,6 +564,26 @@ function updateThemeToggleButton() {
   if (btn) btn.textContent = getThemeIcon();
 }
 
+// ======================== MOBILE DRAWER ========================
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
+
+function closeSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('open');
+}
+
+document.getElementById('sidebar-overlay')?.addEventListener('click', closeSidebar);
+document.querySelectorAll('.nav-item, .add-project-btn').forEach(el => {
+  el.addEventListener('click', closeSidebar);
+});
+
 // ======================== DEFAULT DATA ========================
 const DEFAULT_PROJECTS = {
   plugo: {
@@ -484,388 +603,192 @@ const DEFAULT_PROJECTS = {
           {text:'Criar páginas: Home, Sobre, Mapa de pontos, B2B, B2C, Contato/WhatsApp',done:false,notes:'',assignee:'',doneBy:''},
           {text:'Integrar botão WhatsApp com mensagem pré-formatada',done:false,notes:'',assignee:'',doneBy:''},
           {text:'Configurar domínio e hospedagem (Vercel gratuito ou Hostinger)',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 3',title:'Redes Sociais',dates:'21–25 Abr 2026',resp:'Você + Claude',tools:'Claude, Canva, Meta Business Suite',tasks:[
-          {text:'Criar Google Meu Negócio (um por ponto de recarga) e LinkedIn',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Reestruturar Instagram: bio, destaques',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar 12 posts para o mês (4 carrosséis, 4 reels, 4 stories)',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Temas: Como funciona um eletroposto?, Quanto custa carregar?, Onde encontrar PLugo',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 4',title:'Atendimento e CRM',dates:'28 Abr – 02 Mai 2026',resp:'Você',tools:'WhatsApp Business, Google Sheets, Claude',tasks:[
-          {text:'Configurar WhatsApp Business com catálogo e respostas rápidas',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar fluxo de atendimento: motorista → empresa → consultoria',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Definir métricas: seguidores, visitas site, contatos WhatsApp, recargas/mês',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar CRM básico no Google Sheets para leads e oportunidades',done:false,notes:'',assignee:'',doneBy:''}
-        ]}
-      ]},
-      { name:'Fase 2 — Aquisição e Posicionamento', description:'Gerar demanda, atrair motoristas e empresas.', weeks:[
-        {num:'Sem 5',title:'Landing Page B2B',dates:'05–09 Mai 2026',resp:'Você + Claude',tools:'Claude, Tally',tasks:[
-          {text:"Criar landing page: 'Quero instalar um eletroposto'",done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar formulário: nome, empresa, tipo, cidade, telefone',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar PDF de apresentação comercial profissional',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 6',title:'SEO e Conteúdo',dates:'12–16 Mai 2026',resp:'Você + Claude',tools:'Claude, Google Search Console',tasks:[
-          {text:'Criar artigo: Guia de instalação de eletroposto',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar artigo: Eletroposto em condomínio',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar artigo: Legislação sobre eletropostos',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Publicar artigos no site',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Configurar Google Search Console e enviar sitemap',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 7',title:'Prospecção B2B',dates:'19–23 Mai 2026',resp:'Você',tools:'Google Sheets, WhatsApp, LinkedIn',tasks:[
-          {text:'Mapear parceiros: concessionárias EV, construtoras, shoppings, postos',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar lista de 30 prospects B2B',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Definir script de abordagem (contato, follow-up, proposta)',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Iniciar abordagem via WhatsApp/LinkedIn',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 8',title:'Conteúdo Mês 2',dates:'26–30 Mai 2026',resp:'Você + Claude',tools:'Claude, Canva',tasks:[
-          {text:'Produzir 12 posts para junho',done:false,notes:'',assignee:'',doneBy:''},
-          {text:"Criar 1 vídeo: 'Tour por um eletroposto PLugo'",done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 9',title:'Tráfego Pago',dates:'02–06 Jun 2026',resp:'Você',tools:'Meta Ads, Claude',tasks:[
-          {text:'Campanha Instagram/Facebook R$300-500',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Definir público: carros elétricos, sustentabilidade',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar 2 criativos para A/B test',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 10',title:'Otimização e Modelo',dates:'09–13 Jun 2026',resp:'Você + Claude',tools:'Claude, Google Docs',tasks:[
-          {text:'Analisar resultados da campanha e otimizar',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar proposta padronizada B2B',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Documentar modelo de negócio em canvas',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 11',title:'Prospecção Ativa',dates:'16–20 Jun 2026',resp:'Você',tools:'Google Sheets, WhatsApp',tasks:[
-          {text:'Visitar/ligar para os 10 melhores prospects',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Levar proposta comercial + apresentação',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Registrar tudo no CRM',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 12',title:'Revisão de Meio de Caminho',dates:'23–27 Jun 2026',resp:'Você + Claude',tools:'Claude, Google Sheets',tasks:[
-          {text:'Analisar métricas: seguidores, leads, recargas, conversões',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Ajustar estratégia com base nos dados',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Planejar conteúdo de julho',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar relatório mensal de KPIs',done:false,notes:'',assignee:'',doneBy:''}
-        ]}
-      ]},
-      { name:'Fase 3 — Escala e Modelo Replicável', description:'Escalar pontos, consolidar modelo, desenhar franquia.', weeks:[
-        {num:'Sem 13-14',title:'Documentação Operacional',dates:'Jul sem 1–2',resp:'Você + Claude',tools:'Claude, Google Docs, draw.io',tasks:[
-          {text:'Documentar processo operacional completo',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar manual de operações PLugo (SOPs)',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar fluxograma: prospecção → contrato → instalação → ativação → operação',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 15-16',title:'Ferramentas de Conversão',dates:'Jul sem 3–4',resp:'Você + Claude',tools:'Claude (React + FAQ)',tasks:[
-          {text:'Criar calculadora de viabilidade B2B no site',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar página de FAQ completa',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 17-18',title:'Modelo de Consultoria',dates:'Ago sem 1–2',resp:'Você + Claude',tools:'Claude, Google Docs',tasks:[
-          {text:'Desenvolver pacote de consultoria',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar landing page para consultoria',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Definir precificação',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 19-20',title:'Indicação e Tráfego',dates:'Ago sem 3–4',resp:'Você + Claude',tools:'Claude, Meta Ads',tasks:[
-          {text:'Criar programa de indicação B2B',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Material de co-marketing com parceiros',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Segundo ciclo de tráfego pago',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 21-22',title:'Desenho de Franquia',dates:'Set sem 1–2',resp:'Você + Claude',tools:'Claude',tasks:[
-          {text:'Documentar modelo de franquia',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Pesquisar requisitos legais (Lei 13.966/2019, COF)',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar documento preliminar Franquia PLugo',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 23-24',title:'Revisão Trimestral',dates:'Set sem 3–4',resp:'Você + Claude',tools:'Google Sheets',tasks:[
-          {text:'Revisão: pontos, receita, leads, consultorias',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Ajustar metas para Q4',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Decidir contratação de comercial',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Planejar participação em eventos',done:false,notes:'',assignee:'',doneBy:''}
-        ]}
-      ]},
-      { name:'Fase 4 — Consolidação e Expansão', description:'Consolidar operação, lançar consultoria, preparar franquia.', weeks:[
-        {num:'Sem 25-28',title:'Lançamento Consultoria',dates:'Outubro 2026',resp:'Você + Claude',tools:'Claude, Meta Ads, YouTube',tasks:[
-          {text:'Lançamento oficial consultoria com campanha',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Webinar: Como abrir um eletroposto no Brasil',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Escalar tráfego pago',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar canal YouTube educativo',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 29-32',title:'Preparação de Franquia',dates:'Novembro 2026',resp:'Você + Claude',tools:'Claude',tasks:[
-          {text:'Refinar modelo de franquia',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Criar pitch deck para investidores',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Networking em eventos do setor',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Construir board de advisors',done:false,notes:'',assignee:'',doneBy:''}
-        ]},
-        {num:'Sem 33-36',title:'Balanço e Planejamento 2027',dates:'Dezembro 2026',resp:'Você + Claude',tools:'Google Sheets, Claude',tasks:[
-          {text:'Balanço anual: KPIs, receita, pontos',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Documentar aprendizados',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Planejamento 2027: expansão, franquia, novas cidades',done:false,notes:'',assignee:'',doneBy:''},
-          {text:'Preparar material de franquia para Q1 2027',done:false,notes:'',assignee:'',doneBy:''}
         ]}
       ]}
     ]
-  },
-  solucoesup: {
-    name:'SoluçõesUP', icon:'🔒', color:'#3b82f6',
-    description:'Portaria remota/autônoma, controle de acesso, monitoramento',
-    access: {},
-    phases:[{name:'Roadmap Pendente',description:'Roadmap detalhado será construído em breve.',weeks:[
-      {num:'—',title:'Próximas definições',dates:'A definir',resp:'Você + Claude',tools:'Claude',tasks:[
-        {text:'Documentar processos existentes dos colaboradores',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Criar manuais de procedimentos (N1, N2, campo)',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Implementar CRM para pipeline de vendas',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Atualizar site com serviços corretos',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Criar estratégia de marketing e captação',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Melhorar propostas comerciais',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Estruturar produtos recorrentes para escala nacional',done:false,notes:'',assignee:'',doneBy:''}
-      ]}
-    ]}]
-  },
-  'uplink-servico': {
-    name:'UpLink Serviço e Comércio', icon:'🏗️', color:'#8b5cf6',
-    description:'Prestação de serviço e fornecimento para indústria (ENEVA)',
-    access: {},
-    phases:[{name:'Roadmap Pendente',description:'Roadmap detalhado será construído em breve.',weeks:[
-      {num:'—',title:'Próximas definições',dates:'A definir',resp:'Você + Claude',tools:'Claude',tasks:[
-        {text:'Criar site institucional',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Criar LinkedIn corporativo',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Estruturar documentação para licitações',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Estruturar documentação para leilões',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Mapear oportunidades no setor industrial',done:false,notes:'',assignee:'',doneBy:''}
-      ]}
-    ]}]
-  },
-  'uplink-provedor': {
-    name:'UpLink Provedor de Internet', icon:'🌐', color:'#f59e0b',
-    description:'Provedor de Internet (ISP) — desde 2019',
-    access: {},
-    phases:[{name:'Roadmap Pendente',description:'Roadmap detalhado será construído em breve.',weeks:[
-      {num:'—',title:'Próximas definições',dates:'A definir',resp:'Você + Claude',tools:'Claude',tasks:[
-        {text:'Documentar processos dos funcionários (N1, N2, N3)',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Atualizar site www.uplinkrr.com.br',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Criar campanha de marketing e captação ativa',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Melhorar contratos de serviço',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Automatizar atendimento de demandas',done:false,notes:'',assignee:'',doneBy:''},
-        {text:'Expandir chatbot integrado ao ERP',done:false,notes:'',assignee:'',doneBy:''}
-      ]}
-    ]}]
   }
 };
 
-// ======================== FIREBASE CONFIG ========================
+// ======================== FIREBASE ========================
 function getSavedConfig() {
-  try { return JSON.parse(localStorage.getItem(CONFIG_KEY)); } catch(e) { return null; }
+  return JSON.parse(localStorage.getItem(CONFIG_KEY));
 }
 
 function saveFirebaseConfig() {
   const config = {
-    apiKey: document.getElementById('cfg-apiKey').value.trim(),
-    authDomain: document.getElementById('cfg-authDomain').value.trim(),
-    databaseURL: document.getElementById('cfg-databaseURL').value.trim(),
-    projectId: document.getElementById('cfg-projectId').value.trim()
+    apiKey: document.getElementById('cfg-apiKey').value,
+    authDomain: document.getElementById('cfg-authDomain').value,
+    databaseURL: document.getElementById('cfg-databaseURL').value,
+    projectId: document.getElementById('cfg-projectId').value
   };
-  if (!config.apiKey || !config.authDomain || !config.databaseURL || !config.projectId) {
-    document.getElementById('setup-error').textContent = 'Preencha todos os campos.';
+  if (!config.apiKey || !config.authDomain || !config.databaseURL) {
+    document.getElementById('setup-error').textContent = 'Preencha todos os campos';
     return;
   }
   localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-  location.reload();
+  window.location.reload();
 }
 
 function initFirebase(config) {
   try {
     firebase.initializeApp(config);
-    auth = firebase.auth();
     db = firebase.database();
+    auth = firebase.auth();
     return true;
   } catch(e) {
-    console.error('Firebase init error:', e);
     return false;
   }
 }
 
-// ======================== AUTH ========================
 function loginWithGoogle() {
   document.getElementById('login-loading').style.display = 'block';
-  document.getElementById('login-error').textContent = '';
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err => {
+  auth.signInWithPopup(provider).catch(e => {
+    document.getElementById('login-error').textContent = e.message;
     document.getElementById('login-loading').style.display = 'none';
-    document.getElementById('login-error').textContent = 'Erro: ' + err.message;
   });
 }
 
 function logout() {
-  auth.signOut();
+  auth.signOut().then(() => {
+    location.reload();
+  });
 }
 
 function onAuthStateChanged(user) {
-  if (user) {
-    currentUser = { uid: user.uid, name: user.displayName, email: user.email, photo: user.photoURL };
-    // Check user status
-    db.ref('users/' + user.uid + '/status').once('value', snap => {
-      const status = snap.val();
-      if (status === 'pending') {
-        showApprovalScreen('pending');
-        return;
-      }
-      if (status === 'rejected') {
-        showApprovalScreen('rejected');
-        return;
-      }
-      // User is approved or has no status (old users, auto-approved)
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('approval-screen').classList.remove('visible');
-      document.getElementById('app').classList.add('visible');
-      initializeUserAndListeners(user);
-    });
-  } else {
-    currentUser = null;
-    document.getElementById('app').classList.remove('visible');
-    document.getElementById('approval-screen').classList.remove('visible');
+  if (!user) {
     document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').classList.remove('visible');
+    return;
   }
+  currentUser = {
+    uid: user.uid,
+    name: user.displayName || 'Usuário',
+    email: user.email,
+    photo: user.photoURL
+  };
+  initializeUserAndListeners(user);
 }
 
 function initializeUserAndListeners(user) {
-  // Save user to DB
-  db.ref('users/' + user.uid).once('value', snap => {
-    const existing = snap.val();
-    if (!existing) {
-      // New user - set as pending unless they're the first user
-      const isFirstUser = false;
-      db.ref('users').once('value', snap => {
-        const users = snap.val() || {};
-        const isFirstUser = Object.keys(users).length === 0;
-        db.ref('users/' + user.uid).update({
-          name: user.displayName,
-          email: user.email,
-          photo: user.photoURL,
-          status: isFirstUser ? 'approved' : 'pending',
-          role: isFirstUser ? 'admin' : 'membro',
-          createdAt: firebase.database.ServerValue.TIMESTAMP,
-          lastSeen: firebase.database.ServerValue.TIMESTAMP
-        });
-      });
-    } else {
-      db.ref('users/' + user.uid).update({
-        lastSeen: firebase.database.ServerValue.TIMESTAMP
-      });
+  const newUserRef = db.ref('users/'+user.uid);
+  newUserRef.once('value', snap => {
+    if (!snap.exists()) {
+      newUserRef.set({name: user.displayName, email: user.email, photo: user.photoURL, role:'membro', status:'pending'});
     }
   });
 
-  // Set presence
-  const presRef = db.ref('presence/' + user.uid);
-  presRef.set({ name: user.displayName, photo: user.photoURL, online: true });
-  presRef.onDisconnect().remove();
-
-  // Setup listeners
   setupListeners();
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  showDashboard();
 }
 
 function showApprovalScreen(status) {
   const screen = document.getElementById('approval-screen');
-  const icon = document.getElementById('approval-icon');
-  const title = document.getElementById('approval-title');
-  const text = document.getElementById('approval-text');
-
-  if (status === 'rejected') {
-    icon.textContent = '❌';
-    title.textContent = 'Acesso Negado';
-    text.textContent = 'Infelizmente, sua solicitação de acesso foi rejeitada.';
-  } else {
-    icon.textContent = '⏳';
-    title.textContent = 'Aguardando Aprovação';
-    text.textContent = 'Sua conta foi criada, mas ainda está aguardando aprovação do administrador.';
-  }
-
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').classList.remove('visible');
   screen.classList.add('visible');
+  document.getElementById('app').classList.remove('visible');
+  if (status === 'rejected') {
+    document.getElementById('approval-icon').textContent = '❌';
+    document.getElementById('approval-title').textContent = 'Acesso Negado';
+    document.getElementById('approval-text').textContent = 'Sua solicitação de acesso foi negada. Entre em contato com o administrador.';
+  }
 }
 
-// ======================== PERMISSIONS ========================
 function userCanAccessProject(projId) {
-  const proj = projectsData[projId];
-  if (!proj) return false;
-
-  const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
-  if (isAdmin) return true;
-
-  const access = proj.access || {};
-  if (Object.keys(access).length === 0) return true; // No restrictions = all approved users can access
-
-  return access[currentUser.uid] ? true : false;
+  const role = getUserAccessRole(projId);
+  return role !== null;
 }
 
 function getUserAccessRole(projId) {
   const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
-  if (isAdmin) return 'editor';
-
-  const proj = projectsData[projId];
-  const access = proj.access || {};
-  return access[currentUser.uid] || null;
+  if (isAdmin) return 'admin';
+  const access = projectsData[projId]?.access || {};
+  return access[currentUser?.uid] || null;
 }
 
 function isTaskEditable(projId) {
   const role = getUserAccessRole(projId);
-  return role === 'editor';
+  return role !== null;
 }
 
-// ======================== REALTIME LISTENERS ========================
-function setupListeners() {
-  // Projects
-  db.ref('projects').on('value', snap => {
-    const val = snap.val();
-    if (!val) {
-      db.ref('projects').set(DEFAULT_PROJECTS);
-      return;
-    }
-    projectsData = val;
-    refreshCurrentView();
-  });
+function canEditTask(taskId) {
+  const task = tasksData[taskId];
+  if (!task) return false;
+  const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
+  if (isAdmin) return true;
+  if (task.createdBy === currentUser?.uid) return true;
+  if (task.assignee === currentUser?.uid) return true;
+  return false;
+}
 
-  // Users
+function setupListeners() {
   db.ref('users').on('value', snap => {
     usersData = snap.val() || {};
-    // Set first user as admin if no admin exists
-    const hasAdmin = Object.values(usersData).some(u => u.role === 'admin');
-    if (!hasAdmin && currentUser && usersData[currentUser.uid]) {
-      db.ref('users/' + currentUser.uid + '/role').set('admin');
-      db.ref('users/' + currentUser.uid + '/status').set('approved');
+    const currentStatus = usersData[currentUser?.uid]?.status;
+    if (currentStatus === 'rejected') {
+      showApprovalScreen('rejected');
+      return;
     }
-    refreshCurrentView();
-    renderUserBar();
+    if (currentStatus === 'pending') {
+      showApprovalScreen('pending');
+      return;
+    }
     updatePendingBadge();
+    refreshCurrentView();
   });
 
-  // Activity
-  db.ref('activity').orderByChild('ts').limitToLast(50).on('value', snap => {
-    activityData = [];
-    snap.forEach(c => activityData.unshift({ ...c.val(), key: c.key }));
-    if (currentView === 'activity') showActivity();
+  db.ref('projects').on('value', snap => {
+    projectsData = snap.val() || {};
+    if (Object.keys(projectsData).length === 0 && Object.keys(DEFAULT_PROJECTS).length > 0) {
+      db.ref('projects').set(DEFAULT_PROJECTS);
+    }
+    renderSidebar();
+    refreshCurrentView();
   });
 
-  // Presence
+  db.ref('tasks').on('value', snap => {
+    tasksData = snap.val() || {};
+    if (currentView === 'tasks') refreshCurrentView();
+  });
+
+  db.ref('activity').on('value', snap => {
+    const activities = snap.val() || {};
+    activityData = Object.values(activities).sort((a,b) => b.ts - a.ts);
+    if (currentView === 'activity') refreshCurrentView();
+  });
+
+  db.ref('.info/connected').on('value', snap => {
+    if (snap.val()) {
+      const presenceRef = db.ref('presence/'+currentUser.uid);
+      presenceRef.set({name: currentUser.name, photo: currentUser.photo, ts: Date.now()});
+      presenceRef.onDisconnect().remove();
+    }
+  });
+
   db.ref('presence').on('value', snap => {
     renderOnlineUsers(snap.val() || {});
   });
 }
 
 function renderOnlineUsers(presence) {
-  const container = document.getElementById('online-users');
-  const uids = Object.keys(presence);
-  if (uids.length === 0) { container.innerHTML = ''; return; }
-  let html = uids.slice(0, 5).map(uid => {
-    const p = presence[uid];
-    return `<img class="online-dot" src="${p.photo||''}" title="${p.name}" onerror="this.style.display='none'">`;
-  }).join('');
-  if (uids.length > 5) html += `<span class="online-count">+${uids.length-5}</span>`;
-  container.innerHTML = html;
+  let html = '';
+  let count = 0;
+  Object.entries(presence).forEach(([uid,user]) => {
+    if (user && user.photo) {
+      html += `<img class="online-dot" src="${user.photo}" alt="" title="${user.name}">`;
+      count++;
+    }
+  });
+  if (count > 0) html += `<span class="online-count">${count}</span>`;
+  document.getElementById('online-users').innerHTML = html;
 }
 
 function updatePendingBadge() {
-  const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
-  if (!isAdmin) {
-    document.getElementById('team-pending-badge').style.display = 'none';
-    return;
-  }
-  const pending = Object.values(usersData).filter(u => u.status === 'pending').length;
+  const pendingCount = Object.values(usersData).filter(u => u.status === 'pending').length;
   const badge = document.getElementById('team-pending-badge');
-  if (pending > 0) {
-    badge.textContent = pending;
+  if (pendingCount > 0) {
+    badge.textContent = pendingCount;
     badge.style.display = 'inline';
   } else {
     badge.style.display = 'none';
@@ -873,185 +796,242 @@ function updatePendingBadge() {
 }
 
 function logActivity(action, detail) {
-  if (!currentUser) return;
-  db.ref('activity').push({
-    uid: currentUser.uid,
+  const actRef = db.ref('activity').push();
+  actRef.set({
     name: currentUser.name,
     photo: currentUser.photo,
-    action, detail,
-    ts: firebase.database.ServerValue.TIMESTAMP
+    action: action,
+    detail: detail,
+    ts: Date.now()
   });
 }
 
 // ======================== STATS ========================
 function projectStats(proj) {
-  let total=0,done=0;
-  (proj.phases||[]).forEach(ph => (ph.weeks||[]).forEach(w => (w.tasks||[]).forEach(t => { total++; if(t.done) done++; })));
-  return {total,done,pct:total?Math.round(done/total*100):0};
-}
-function phaseStats(phase) {
-  let total=0,done=0;
-  (phase.weeks||[]).forEach(w => (w.tasks||[]).forEach(t => { total++; if(t.done) done++; }));
-  return {total,done,pct:total?Math.round(done/total*100):0};
-}
-function weekStats(week) {
-  const tasks = week.tasks||[];
-  let total=tasks.length,done=tasks.filter(t=>t.done).length;
-  return {total,done,pct:total?Math.round(done/total*100):0};
-}
-function globalStats() {
-  let total=0,done=0;
-  Object.entries(projectsData).forEach(([id,p]) => {
-    if (userCanAccessProject(id)) {
-      const s=projectStats(p);
-      total+=s.total;
-      done+=s.done;
-    }
+  let total = 0, done = 0;
+  (proj.phases || []).forEach(phase => {
+    (phase.weeks || []).forEach(week => {
+      (week.tasks || []).forEach(task => {
+        total++;
+        if (task.done) done++;
+      });
+    });
   });
-  return {total,done,pct:total?Math.round(done/total*100):0};
+  const pct = total > 0 ? Math.round(100 * done / total) : 0;
+  return {done, total, pct};
 }
 
-// ======================== NAVIGATION ========================
+function phaseStats(phase) {
+  let total = 0, done = 0;
+  (phase.weeks || []).forEach(week => {
+    (week.tasks || []).forEach(task => {
+      total++;
+      if (task.done) done++;
+    });
+  });
+  return {done, total};
+}
+
+function weekStats(week) {
+  let total = 0, done = 0;
+  (week.tasks || []).forEach(task => {
+    total++;
+    if (task.done) done++;
+  });
+  return {done, total};
+}
+
+function globalStats() {
+  let total = 0, done = 0;
+  Object.values(projectsData).forEach(proj => {
+    const s = projectStats(proj);
+    total += s.total;
+    done += s.done;
+  });
+  return {total, done};
+}
+
 function refreshCurrentView() {
-  renderSidebar();
   if (currentView === 'dashboard') showDashboard();
-  else if (currentView === 'project' && currentProject) {
-    if (userCanAccessProject(currentProject)) showProject(currentProject);
-    else showDashboard();
-  }
   else if (currentView === 'team') showTeam();
   else if (currentView === 'activity') showActivity();
+  else if (currentView === 'tasks') showTasks();
+  else if (currentView === 'project') showProject(currentProject);
 }
 
+// ======================== SIDEBAR & NAV ========================
 function renderSidebar() {
-  const container = document.getElementById('sidebar-projects');
-  container.innerHTML = Object.entries(projectsData).map(([id,p]) => {
-    if (!userCanAccessProject(id)) return '';
-    const s = projectStats(p);
-    const active = currentView==='project' && currentProject===id;
-    return `<button class="nav-item ${active?'active':''}" onclick="showProject('${id}')">
-      <span class="nav-dot" style="background:${p.color}"></span>
-      <span>${p.name}</span>
-      <span class="nav-count">${s.pct}%</span>
+  const items = Object.entries(projectsData).filter(([id,p]) => userCanAccessProject(id));
+  let html = '';
+  items.forEach(([id,proj]) => {
+    const stats = projectStats(proj);
+    const pct = stats.total > 0 ? Math.round(100 * stats.done / stats.total) : 0;
+    html += `<button class="nav-item ${currentProject===id?'active':''}" onclick="showProject('${id}')">
+      <span class="nav-dot" style="background:${proj.color||'#3b82f6'}"></span>
+      <span>${proj.icon} ${proj.name}</span>
+      <span class="nav-count">${pct}%</span>
     </button>`;
-  }).join('');
-  document.querySelectorAll('.nav-item[data-view]').forEach(el => {
-    el.classList.toggle('active', el.dataset.view === currentView);
   });
+  document.getElementById('sidebar-projects').innerHTML = html;
+
+  const allTasks = Object.values(tasksData).length;
+  const tc = document.getElementById('task-nav-count');
+  if (allTasks > 0) {
+    tc.textContent = allTasks;
+    tc.style.display = 'inline';
+  } else {
+    tc.style.display = 'none';
+  }
+
+  renderUserBar();
 }
 
-// ======================== DASHBOARD ========================
 function showDashboard() {
-  currentView = 'dashboard'; currentProject = null;
+  closeSidebar();
+  currentView = 'dashboard';
+  currentProject = null;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-view="dashboard"]').classList.add('active');
+
   document.getElementById('topbar-title').textContent = 'Dashboard';
   document.getElementById('topbar-badge').style.display = 'none';
   document.getElementById('topbar-actions').innerHTML = '';
-  renderSidebar();
+  document.getElementById('fab-new-task').style.display = 'none';
+
   const gs = globalStats();
-  const projEntries = Object.entries(projectsData).filter(([id]) => userCanAccessProject(id));
-  let html = `
-    <div style="margin-bottom:24px;padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <span style="font-weight:600">Progresso Geral</span>
-        <span style="font-size:24px;font-weight:700;color:var(--green)">${gs.pct}%</span>
-      </div>
-      <div style="height:8px;background:var(--bg);border-radius:8px;overflow:hidden">
-        <div style="height:100%;width:${gs.pct}%;background:var(--green);border-radius:8px;transition:width 0.5s"></div>
-      </div>
-      <div style="font-size:12px;color:var(--text3);margin-top:6px">${gs.done} de ${gs.total} tarefas em ${projEntries.length} empresas</div>
+  const html = `
+    <h3 style="margin-bottom:16px;color:var(--text)">Empresas</h3>
+    <div class="dashboard-grid">
+      ${Object.entries(projectsData).filter(([id]) => userCanAccessProject(id)).map(([id,proj]) => {
+        const s = projectStats(proj);
+        const pct = s.total > 0 ? Math.round(100 * s.done / s.total) : 0;
+        return `<div class="dash-card" onclick="showProject('${id}')">
+          <div class="dash-card-header">
+            <span class="dash-card-name">${proj.icon} ${proj.name}</span>
+            <span class="dash-card-icon">→</span>
+          </div>
+          <div class="dash-progress-bar"><div class="dash-progress-fill" style="width:${pct}%;background:${proj.color||'#3b82f6'}"></div></div>
+          <div class="dash-card-stats">
+            <strong>${pct}%</strong>
+            <span>${s.done}/${s.total}</span>
+          </div>
+        </div>`;
+      }).join('')}
     </div>
-    <div class="dashboard-grid">${projEntries.map(([id,p]) => {
-      const s = projectStats(p);
-      return `<div class="dash-card" onclick="showProject('${id}')">
-        <div class="dash-card-header"><span class="dash-card-name">${p.name}</span><span class="dash-card-icon">${p.icon}</span></div>
-        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${p.description||''}</div>
-        <div class="dash-progress-bar"><div class="dash-progress-fill" style="width:${s.pct}%;background:${p.color}"></div></div>
-        <div class="dash-card-stats"><span><strong>${s.done}</strong>/${s.total} tarefas</span><span style="color:${p.color};font-weight:600">${s.pct}%</span></div>
-      </div>`;
-    }).join('')}</div>`;
+    <h3 style="margin:24px 0 16px;color:var(--text)">Resumo</h3>
+    <div class="dashboard-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <span class="dash-card-name">Tarefas</span>
+        </div>
+        <div style="font-size:28px;font-weight:700;color:var(--green)">${gs.total}</div>
+        <div style="font-size:12px;color:var(--text3)">${gs.done} concluídas</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <span class="dash-card-name">Equipe</span>
+        </div>
+        <div style="font-size:28px;font-weight:700;color:var(--blue)">${Object.keys(usersData).length}</div>
+        <div style="font-size:12px;color:var(--text3)">membros</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <span class="dash-card-name">Operacional</span>
+        </div>
+        <div style="font-size:28px;font-weight:700;color:var(--purple)">${Object.keys(tasksData).length}</div>
+        <div style="font-size:12px;color:var(--text3)">tarefas ativas</div>
+      </div>
+    </div>
+  `;
   document.getElementById('content').innerHTML = html;
 }
 
-// ======================== TEAM ========================
 function showTeam() {
-  currentView = 'team'; currentProject = null;
+  closeSidebar();
+  currentView = 'team';
+  currentProject = null;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-view="team"]').classList.add('active');
+
   document.getElementById('topbar-title').textContent = 'Equipe';
   document.getElementById('topbar-badge').style.display = 'none';
   document.getElementById('topbar-actions').innerHTML = '';
-  renderSidebar();
+  document.getElementById('fab-new-task').style.display = 'none';
+
   const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
-  const users = Object.entries(usersData).filter(([,u]) => u.status === 'approved' || u.status === 'pending' || u.status === 'rejected' || !u.status);
+  let html = '<div class="team-grid">';
 
-  // Count tasks per user
-  const taskCounts = {};
-  Object.values(projectsData).forEach(p =>
-    (p.phases||[]).forEach(ph => (ph.weeks||[]).forEach(w => (w.tasks||[]).forEach(t => {
-      if (t.assignee) {
-        if (!taskCounts[t.assignee]) taskCounts[t.assignee] = {total:0,done:0};
-        taskCounts[t.assignee].total++;
-        if (t.done) taskCounts[t.assignee].done++;
+  html += Object.entries(usersData).map(([uid, u]) => {
+    let tc = {done:0, total:0};
+    Object.values(tasksData).forEach(task => {
+      if (task.assignee === uid) {
+        tc.total++;
+        if (task.status === 'Concluída') tc.done++;
       }
-    })))
-  );
+    });
 
-  let html = `<h3 style="margin-bottom:16px;font-size:16px">${users.length} membros</h3>
-    <div class="team-grid">${users.map(([uid,u]) => {
-      const tc = taskCounts[uid] || {total:0,done:0};
-      const status = u.status || 'approved';
-      let statusBadgeHTML = '';
-      let actionHTML = '';
+    const status = u.status || 'approved';
+    let statusBadgeHTML = '';
+    let actionHTML = '';
 
-      if (status === 'pending') {
-        statusBadgeHTML = `<span class="team-status-badge" style="background:var(--yellow);color:#333">⏳ Pendente</span>`;
-        if (isAdmin) {
-          actionHTML = `<div class="team-actions">
-            <button class="team-action-btn approve" onclick="approveUser('${uid}')">Aprovar</button>
-            <button class="team-action-btn reject" onclick="rejectUser('${uid}')">Rejeitar</button>
-          </div>`;
-        }
-      } else if (status === 'rejected') {
-        statusBadgeHTML = `<span class="team-status-badge" style="background:var(--red-bg);color:var(--red)">❌ Rejeitado</span>`;
+    if (status === 'pending') {
+      statusBadgeHTML = `<span class="team-status-badge" style="background:var(--yellow);color:#333">⏳ Pendente</span>`;
+      if (isAdmin) {
+        actionHTML = `<div class="team-actions">
+          <button class="team-action-btn approve" onclick="approveUser('${uid}')">Aprovar</button>
+          <button class="team-action-btn reject" onclick="rejectUser('${uid}')">Rejeitar</button>
+        </div>`;
       }
+    } else if (status === 'rejected') {
+      statusBadgeHTML = `<span class="team-status-badge" style="background:var(--red-bg);color:var(--red)">❌ Rejeitado</span>`;
+    }
 
-      return `<div class="team-card">
-        <img class="team-avatar" src="${u.photo||''}" alt="" onerror="this.style.background='var(--bg4)'">
-        <div>
-          <div class="team-name">${u.name}</div>
-          <div class="team-tasks">${tc.done}/${tc.total} tarefas</div>
-          <span class="team-role-badge" style="background:${u.role==='admin'?'var(--orange-bg)':'var(--blue-bg)'};color:${u.role==='admin'?'var(--orange)':'var(--blue)'}">
-            ${u.role||'membro'}
-          </span>
-          ${statusBadgeHTML}
-          ${isAdmin && uid !== currentUser.uid && !statusBadgeHTML ? `<button class="team-action-btn" style="margin-top:4px;font-size:10px" onclick="toggleRole('${uid}','${u.role==='admin'?'membro':'admin'}')">${u.role==='admin'?'Remover admin':'Tornar admin'}</button>` : ''}
-          ${actionHTML}
-        </div>
-      </div>`;
-    }).join('')}</div>`;
+    return `<div class="team-card">
+      <img class="team-avatar" src="${u.photo||''}" alt="" onerror="this.style.background='var(--bg4)'">
+      <div>
+        <div class="team-name">${u.name}</div>
+        <div class="team-tasks">${tc.done}/${tc.total} tarefas</div>
+        <span class="team-role-badge" style="background:${u.role==='admin'?'var(--orange-bg)':'var(--blue-bg)'};color:${u.role==='admin'?'var(--orange)':'var(--blue)'}">
+          ${u.role||'membro'}
+        </span>
+        ${statusBadgeHTML}
+        ${isAdmin && uid !== currentUser.uid && !statusBadgeHTML ? `<button class="team-action-btn" style="margin-top:4px;font-size:10px" onclick="toggleRole('${uid}','${u.role==='admin'?'membro':'admin'}')">${u.role==='admin'?'Remover admin':'Tornar admin'}</button>` : ''}
+        ${actionHTML}
+      </div>
+    </div>`;
+  }).join('');
+
+  html += '</div>';
   document.getElementById('content').innerHTML = html;
 }
 
 function toggleRole(uid, newRole) {
   db.ref('users/' + uid + '/role').set(newRole);
-  logActivity('role', `Alterou papel de ${usersData[uid]?.name} para ${newRole}`);
+  logActivity('alterou papel de', `${usersData[uid]?.name} para ${newRole}`);
 }
 
 function approveUser(uid) {
   db.ref('users/' + uid + '/status').set('approved');
-  logActivity('aprovação', `Aprovou ${usersData[uid]?.name}`);
+  logActivity('aprovou', usersData[uid]?.name);
 }
 
 function rejectUser(uid) {
   db.ref('users/' + uid + '/status').set('rejected');
-  logActivity('rejeição', `Rejeitou ${usersData[uid]?.name}`);
+  logActivity('rejeitou', usersData[uid]?.name);
 }
 
-// ======================== ACTIVITY ========================
 function showActivity() {
-  currentView = 'activity'; currentProject = null;
+  closeSidebar();
+  currentView = 'activity';
+  currentProject = null;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-view="activity"]').classList.add('active');
+
   document.getElementById('topbar-title').textContent = 'Atividades';
   document.getElementById('topbar-badge').style.display = 'none';
   document.getElementById('topbar-actions').innerHTML = '';
-  renderSidebar();
+  document.getElementById('fab-new-task').style.display = 'none';
+
   let html = '<div class="activity-log">';
   if (activityData.length === 0) {
     html += '<div style="text-align:center;padding:40px;color:var(--text3)">Nenhuma atividade ainda.</div>';
@@ -1069,18 +1049,227 @@ function showActivity() {
   document.getElementById('content').innerHTML = html;
 }
 
+// ======================== TAREFAS (KANBAN) ========================
+function showTasks() {
+  closeSidebar();
+  currentView = 'tasks';
+  currentProject = null;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector('[data-view="tasks"]').classList.add('active');
+
+  document.getElementById('topbar-title').textContent = 'Tarefas Operacionais';
+  document.getElementById('topbar-badge').style.display = 'none';
+  document.getElementById('topbar-actions').innerHTML = '';
+  document.getElementById('fab-new-task').style.display = 'flex';
+
+  const filteredTasks = Object.entries(tasksData).filter(([_, task]) => {
+    const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
+    if (isAdmin) return true;
+    return task.createdBy === currentUser?.uid || task.assignee === currentUser?.uid;
+  });
+
+  const columns = ['A Fazer', 'Em Andamento', 'Concluída'];
+  let html = '<div class="kanban-board">';
+
+  columns.forEach(status => {
+    const tasks = filteredTasks.filter(([_, t]) => {
+      if (status === 'A Fazer') return !t.status || t.status === 'A Fazer';
+      if (status === 'Em Andamento') return t.status === 'Em Andamento';
+      if (status === 'Concluída') return t.status === 'Concluída';
+    });
+
+    html += `<div class="kanban-column">
+      <div class="kanban-header">
+        <div class="kanban-title">
+          <span>${status === 'A Fazer' ? '📋' : status === 'Em Andamento' ? '⚙️' : '✅'}</span>
+          ${status}
+        </div>
+        <span class="kanban-count">${tasks.length}</span>
+      </div>
+      <div class="kanban-cards">`;
+
+    if (tasks.length === 0) {
+      html += `<div class="empty-state">
+        <div class="empty-state-emoji">${status === 'A Fazer' ? '📭' : status === 'Em Andamento' ? '⏳' : '🎉'}</div>
+        <div class="empty-state-text">Nenhuma tarefa</div>
+      </div>`;
+    } else {
+      tasks.forEach(([taskId, task]) => {
+        const assignee = usersData[task.assignee];
+        const dueDate = task.dueDate ? new Date(parseInt(task.dueDate)).toLocaleDateString('pt-BR') : '';
+        const priorityClass = task.priority ? task.priority.toLowerCase() : 'baixa';
+
+        html += `<div class="task-card" onclick="editTask('${taskId}')">
+          <div class="card-title">${task.title}</div>
+          ${task.description ? `<div class="card-description">${task.description}</div>` : ''}
+          <div class="card-meta">
+            ${assignee ? `<img class="card-avatar" src="${assignee.photo||''}" alt="${assignee.name}" title="${assignee.name}">` : '<div class="card-avatar-placeholder">👤</div>'}
+            ${task.priority ? `<span class="card-priority ${priorityClass}">${task.priority}</span>` : ''}
+            ${task.company ? `<span class="card-company">${task.company}</span>` : ''}
+            ${dueDate ? `<span class="card-duedate">📅 ${dueDate}</span>` : ''}
+          </div>
+          <div class="card-actions">
+            ${status !== 'Concluída' && canEditTask(taskId) ? `<button class="card-btn" onclick="changeTaskStatus(event, '${taskId}', '${status === 'A Fazer' ? 'Em Andamento' : 'Concluída'}')">
+              ${status === 'A Fazer' ? '▶️ Iniciar' : '✅ Concluir'}
+            </button>` : ''}
+            ${canEditTask(taskId) ? `<button class="card-btn" onclick="deleteTask(event, '${taskId}')">🗑️</button>` : ''}
+          </div>
+        </div>`;
+      });
+    }
+
+    html += `</div></div>`;
+  });
+
+  html += '</div>';
+  document.getElementById('content').innerHTML = html;
+}
+
+function changeTaskStatus(event, taskId, newStatus) {
+  event.stopPropagation();
+  if (!canEditTask(taskId)) return;
+  db.ref('tasks/'+taskId+'/status').set(newStatus);
+  const task = tasksData[taskId];
+  logActivity('alterou status', `"${task.title.substring(0,30)}" para ${newStatus}`);
+}
+
+function deleteTask(event, taskId) {
+  event.stopPropagation();
+  if (!canEditTask(taskId)) return;
+  if (!confirm('Remover esta tarefa?')) return;
+  const task = tasksData[taskId];
+  db.ref('tasks/'+taskId).remove();
+  logActivity('removeu tarefa', `"${task.title.substring(0,30)}"`);
+}
+
+function editTask(taskId) {
+  if (!canEditTask(taskId)) return;
+  const task = tasksData[taskId];
+  openModal(`<h3>Editar Tarefa</h3>
+    <div class="modal-field"><label class="modal-label">Título</label><input class="modal-input" id="et-title" value="${task.title}"></div>
+    <div class="modal-field"><label class="modal-label">Descrição</label><textarea class="modal-textarea" id="et-desc">${task.description||''}</textarea></div>
+    <div class="modal-field"><label class="modal-label">Responsável</label>
+      <select class="modal-select" id="et-assignee">
+        <option value="">Sem atribuição</option>
+        ${Object.entries(usersData).filter(([_,u]) => u.status === 'approved').map(([uid,u]) => `<option value="${uid}" ${task.assignee===uid?'selected':''}>${u.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-field"><label class="modal-label">Empresa</label>
+      <select class="modal-select" id="et-company">
+        <option value="">Selecione</option>
+        ${COMPANIES.map(c => `<option ${task.company===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-field"><label class="modal-label">Prioridade</label>
+      <select class="modal-select" id="et-priority">
+        <option value="">Sem prioridade</option>
+        ${PRIORITIES.map(p => `<option ${task.priority===p?'selected':''}>${p}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-field"><label class="modal-label">Prazo</label><input class="modal-input" type="date" id="et-duedate" value="${task.dueDate ? new Date(parseInt(task.dueDate)).toISOString().split('T')[0] : ''}"></div>
+    <div class="modal-field"><label class="modal-label">Status</label>
+      <select class="modal-select" id="et-status">
+        <option ${!task.status || task.status === 'A Fazer' ? 'selected' : ''}>A Fazer</option>
+        <option ${task.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+        <option ${task.status === 'Concluída' ? 'selected' : ''}>Concluída</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn modal-btn-confirm" onclick="updateTask('${taskId}')">Atualizar</button>
+    </div>`);
+}
+
+function updateTask(taskId) {
+  const updates = {
+    title: document.getElementById('et-title').value.trim(),
+    description: document.getElementById('et-desc').value.trim(),
+    assignee: document.getElementById('et-assignee').value,
+    company: document.getElementById('et-company').value,
+    priority: document.getElementById('et-priority').value,
+    dueDate: document.getElementById('et-duedate').value ? new Date(document.getElementById('et-duedate').value).getTime().toString() : '',
+    status: document.getElementById('et-status').value,
+    updatedAt: Date.now()
+  };
+  db.ref('tasks/'+taskId).update(updates);
+  logActivity('atualizou tarefa', `"${updates.title.substring(0,30)}"`);
+  closeModal();
+  showTasks();
+}
+
+function openNewTaskModal() {
+  openModal(`<h3>Nova Tarefa Operacional</h3>
+    <div class="modal-field"><label class="modal-label">Título *</label><input class="modal-input" id="nt-title" placeholder="Ex: Atualizar documentação"></div>
+    <div class="modal-field"><label class="modal-label">Descrição</label><textarea class="modal-textarea" id="nt-desc" placeholder="Detalhes da tarefa"></textarea></div>
+    <div class="modal-field"><label class="modal-label">Responsável</label>
+      <select class="modal-select" id="nt-assignee">
+        <option value="">Sem atribuição</option>
+        ${Object.entries(usersData).filter(([_,u]) => u.status === 'approved').map(([uid,u]) => `<option value="${uid}">${u.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-field"><label class="modal-label">Empresa</label>
+      <select class="modal-select" id="nt-company">
+        <option value="">Selecione</option>
+        ${COMPANIES.map(c => `<option>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-field"><label class="modal-label">Prioridade</label>
+      <select class="modal-select" id="nt-priority">
+        <option>Média</option>
+        <option>Urgente</option>
+        <option>Alta</option>
+        <option>Baixa</option>
+      </select>
+    </div>
+    <div class="modal-field"><label class="modal-label">Prazo</label><input class="modal-input" type="date" id="nt-duedate"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn modal-btn-confirm" onclick="createTask()">Criar</button>
+    </div>`);
+}
+
+function createTask() {
+  const title = document.getElementById('nt-title').value.trim();
+  if (!title) return alert('Título é obrigatório');
+
+  const dueDate = document.getElementById('nt-duedate').value;
+  const newTask = {
+    title,
+    description: document.getElementById('nt-desc').value.trim(),
+    assignee: document.getElementById('nt-assignee').value,
+    company: document.getElementById('nt-company').value,
+    priority: document.getElementById('nt-priority').value,
+    dueDate: dueDate ? new Date(dueDate).getTime().toString() : '',
+    status: 'A Fazer',
+    createdBy: currentUser.uid,
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  };
+
+  db.ref('tasks').push().set(newTask);
+  logActivity('criou tarefa', `"${title.substring(0,30)}"`);
+  closeModal();
+  showTasks();
+}
+
 // ======================== PROJECT VIEW ========================
 function showProject(projectId) {
+  closeSidebar();
   if (!userCanAccessProject(projectId)) {
     showDashboard();
     return;
   }
 
-  currentView = 'project'; currentProject = projectId;
+  currentView = 'project';
+  currentProject = projectId;
   const proj = projectsData[projectId];
   if (!proj) return;
   const phases = proj.phases || [];
   if (currentPhase >= phases.length) currentPhase = 0;
+
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`[onclick="showProject('${projectId}')"]`)?.classList.add('active');
+
   document.getElementById('topbar-title').textContent = (proj.icon||'') + ' ' + proj.name;
   const s = projectStats(proj);
   const badge = document.getElementById('topbar-badge');
@@ -1092,110 +1281,101 @@ function showProject(projectId) {
   document.getElementById('topbar-actions').innerHTML = isAdmin ?
     `<button class="view-btn" onclick="openAddPhaseModal()">+ Fase</button>
      <button class="view-btn" onclick="openEditProjectModal('${projectId}')">Editar</button>` : '';
-  renderSidebar();
+  document.getElementById('fab-new-task').style.display = 'none';
+
   renderProjectContent(proj, projectId);
 }
 
 function renderProjectContent(proj, projectId) {
   const phases = proj.phases || [];
-  const phase = phases[currentPhase];
-  if (!phase) return;
-  const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
-  const canEdit = isTaskEditable(projectId);
-
-  let html = `<div class="phase-tabs">${phases.map((ph,idx) => {
-    const ps = phaseStats(ph);
-    return `<button class="phase-tab ${idx===currentPhase?'active':''}"
-      style="${idx===currentPhase?'background:'+(proj.color||'#3b82f6')+';border-color:transparent;':''}"
-      onclick="setPhase(${idx})">${ph.name} (${ps.pct}%)</button>`;
-  }).join('')}</div>
-  <div style="margin-bottom:16px;padding:14px 16px;background:${proj.color||'#3b82f6'}15;border:1px solid ${proj.color||'#3b82f6'}33;border-radius:var(--radius)">
-    <div style="font-weight:600;font-size:14px;color:${proj.color}">${phase.name}</div>
-    <div style="font-size:12px;color:var(--text2);margin-top:2px">${phase.description||''}</div>
-  </div>`;
-
-  (phase.weeks||[]).forEach((week,wIdx) => {
-    const ws = weekStats(week);
-    html += `<div class="week-group" id="wg-${wIdx}">
-      <div class="week-group-header" onclick="toggleWG(${wIdx})">
-        <div class="wg-left">
-          <span class="wg-label">${week.num||''}</span>
-          <div><div class="wg-title">${week.title||''}</div>
-          <div class="wg-dates">${week.dates||''}${week.resp?' · '+week.resp:''}</div></div>
-        </div>
-        <div class="wg-right">
-          <div class="wg-progress"><div class="wg-progress-fill" style="width:${ws.pct}%;background:${proj.color||'var(--green)'}"></div></div>
-          <span class="wg-count">${ws.done}/${ws.total}</span>
-          <span class="wg-chevron">▾</span>
-        </div>
-      </div>
-      <div class="week-group-body">
-        <div class="wg-meta">
-          ${week.resp?`<span class="wg-meta-tag wg-meta-resp">${week.resp}</span>`:''}
-          ${week.tools?`<span class="wg-meta-tag wg-meta-tools">${week.tools}</span>`:''}
-        </div>
-        ${(week.tasks||[]).map((task,tIdx) => {
-          const assignee = task.assignee && usersData[task.assignee] ? usersData[task.assignee] : null;
-          const doneByUser = task.doneBy && usersData[task.doneBy] ? usersData[task.doneBy] : null;
-          const disableEdit = !canEdit && (task.assignee !== currentUser?.uid);
-          return `<div class="task-row ${task.done?'done':''} ${disableEdit?'task-disabled':''}" id="task-${wIdx}-${tIdx}">
-            <input type="checkbox" class="task-checkbox" ${task.done?'checked':''} ${!canEdit?'disabled':''} onchange="toggleTaskDone('${projectId}',${currentPhase},${wIdx},${tIdx})">
-            <div class="task-content">
-              <div class="task-text">${task.text||''}</div>
-              <div class="task-meta-row">
-                ${assignee ?
-                  `<span class="task-assignee" ${canEdit?`onclick="openAssigneeDropdown(event,'${projectId}',${currentPhase},${wIdx},${tIdx})"`:''}>
-                    <img src="${assignee.photo||''}"> ${assignee.name}
-                  </span>` :
-                  `<span class="task-assignee-placeholder" ${canEdit?`onclick="openAssigneeDropdown(event,'${projectId}',${currentPhase},${wIdx},${tIdx})"`:''}>+ atribuir</span>`
-                }
-                <button class="task-notes-toggle ${task.notes?'has-notes':''}" onclick="toggleNotes(${wIdx},${tIdx})">
-                  ${task.notes?'📝 notas':'+ notas'}
-                </button>
-                ${doneByUser ? `<span class="task-done-by">✓ por ${doneByUser.name}</span>` : ''}
-              </div>
-              <div class="task-notes-area" id="notes-${wIdx}-${tIdx}">
-                <textarea class="task-notes-input" placeholder="Notas, links, observações..." ${!canEdit?'disabled':''}
-                  onblur="saveNotes('${projectId}',${currentPhase},${wIdx},${tIdx},this.value)">${task.notes||''}</textarea>
-              </div>
-            </div>
-            <div class="task-actions">
-              <button class="task-action-btn delete" onclick="deleteTask('${projectId}',${currentPhase},${wIdx},${tIdx})" title="Remover" ${!canEdit?'disabled':''}>${!canEdit?'':''} ✕</button>
-            </div>
-          </div>`;
-        }).join('')}
-        ${canEdit ? `<div class="add-task-row">
-          <input class="add-task-input" id="new-task-${wIdx}" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')addTask('${projectId}',${currentPhase},${wIdx})">
-          <button class="add-task-submit" onclick="addTask('${projectId}',${currentPhase},${wIdx})">+</button>
-        </div>` : ''}
-      </div>
-    </div>`;
+  let html = '<div class="phase-tabs">';
+  phases.forEach((phase, idx) => {
+    const s = phaseStats(phase);
+    html += `<button class="phase-tab ${idx === currentPhase ? 'active' : ''}" onclick="setPhase(${idx})">${phase.name}</button>`;
   });
+  html += '</div>';
 
-  if (isAdmin) {
-    html += `<div style="text-align:center;margin-top:16px">
-      <button class="view-btn" onclick="openAddWeekModal('${projectId}',${currentPhase})" style="background:var(--bg2)">+ Adicionar Semana</button>
-    </div>`;
+  if (phases.length > 0 && currentPhase < phases.length) {
+    const phase = phases[currentPhase];
+    const weeks = phase.weeks || [];
+    const isAdmin = usersData[currentUser?.uid]?.role === 'admin';
+
+    weeks.forEach((week, wIdx) => {
+      const ws = weekStats(week);
+      const openClass = 'open';
+      html += `<div class="week-group ${openClass}" id="wg-${wIdx}">
+        <div class="week-group-header" onclick="toggleWG(${wIdx})">
+          <div class="wg-left">
+            <span class="wg-label">${week.num}</span>
+            <div>
+              <div class="wg-title">${week.title}</div>
+              <div class="wg-dates">${week.dates}</div>
+            </div>
+          </div>
+          <div class="wg-right">
+            <div class="wg-progress"><div class="wg-progress-fill" style="width:${ws.total > 0 ? (100*ws.done/ws.total) : 0}%"></div></div>
+            <span class="wg-count">${ws.done}/${ws.total}</span>
+            <span class="wg-chevron">⌄</span>
+          </div>
+        </div>
+        <div class="week-group-body">
+          <div class="wg-meta">
+            <span class="wg-meta-tag wg-meta-resp">👤 ${week.resp}</span>
+            <span class="wg-meta-tag wg-meta-tools">🛠️ ${week.tools}</span>
+          </div>`;
+
+      (week.tasks || []).forEach((task, tIdx) => {
+        const assignee = task.assignee ? usersData[task.assignee] : null;
+        html += `<div class="task-row ${task.done ? 'done' : ''}">
+          <input class="task-checkbox" type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTaskDone('${projectId}',${currentPhase},${wIdx},${tIdx})" ${!isTaskEditable(projectId) ? 'disabled' : ''}>
+          <div class="task-content">
+            <div class="task-text">${task.text}</div>
+            <div class="task-meta-row">
+              <button class="task-assignee-placeholder" onclick="openAssigneeDropdown(event, '${projectId}', ${currentPhase}, ${wIdx}, ${tIdx})" ${!isTaskEditable(projectId) ? 'disabled' : ''}>
+                ${assignee ? `<span class="task-assignee"><img src="${assignee.photo}" alt=""> ${assignee.name}</span>` : '+'}
+              </button>
+              ${task.notes ? '<button class="task-notes-toggle has-notes" onclick="toggleNotes('+wIdx+','+tIdx+')">📝</button>' : '<button class="task-notes-toggle" onclick="toggleNotes('+wIdx+','+tIdx+')">📝</button>'}
+            </div>
+            <div class="task-notes-area" id="notes-${wIdx}-${tIdx}">
+              <textarea class="task-notes-input" onchange="saveNotes('${projectId}',${currentPhase},${wIdx},${tIdx},this.value)" ${!isTaskEditable(projectId) ? 'disabled' : ''}>${task.notes||''}</textarea>
+            </div>
+          </div>
+          <div class="task-actions">
+            <button class="task-action-btn delete" onclick="deleteTask('${projectId}',${currentPhase},${wIdx},${tIdx})" ${!isTaskEditable(projectId) ? 'disabled' : ''}>✕</button>
+          </div>
+        </div>`;
+      });
+
+      if (isTaskEditable(projectId)) {
+        html += `<div class="add-task-row">
+          <input class="add-task-input" id="new-task-${wIdx}" placeholder="+ Nova tarefa...">
+          <button class="add-task-submit" onclick="addTask('${projectId}',${currentPhase},${wIdx})">Adicionar</button>
+        </div>`;
+      }
+
+      html += `</div></div>`;
+    });
+
+    if (isAdmin) {
+      html += `<button class="view-btn" style="margin-top:16px" onclick="openAddWeekModal('${projectId}',${currentPhase})">+ Semana</button>`;
+    }
   }
+
   document.getElementById('content').innerHTML = html;
 }
 
-// ======================== TASK ACTIONS ========================
 function setPhase(idx) { currentPhase = idx; showProject(currentProject); }
 function toggleWG(idx) { document.getElementById('wg-'+idx)?.classList.toggle('open'); }
 function toggleNotes(wIdx,tIdx) { document.getElementById('notes-'+wIdx+'-'+tIdx)?.classList.toggle('open'); }
 
 function toggleTaskDone(projId,phaseIdx,wIdx,tIdx) {
   if (!isTaskEditable(projId)) return;
-  const path = `projects/${projId}/phases/${phaseIdx}/weeks/${wIdx}/tasks/${tIdx}`;
   const task = projectsData[projId]?.phases?.[phaseIdx]?.weeks?.[wIdx]?.tasks?.[tIdx];
   if (!task) return;
-  const newDone = !task.done;
-  const updates = { [`${path}/done`]: newDone };
-  if (newDone) updates[`${path}/doneBy`] = currentUser.uid;
-  else updates[`${path}/doneBy`] = '';
-  db.ref().update(updates);
-  logActivity(newDone ? 'concluiu' : 'reabriu', `"${(task.text||'').substring(0,50)}" em ${projectsData[projId]?.name}`);
+  task.done = !task.done;
+  task.doneBy = task.done ? currentUser.name : '';
+  db.ref(`projects/${projId}/phases/${phaseIdx}/weeks/${wIdx}/tasks/${tIdx}`).set(task);
+  logActivity(task.done ? 'concluiu' : 'reaberiu', `"${task.text.substring(0,50)}"`);
 }
 
 function saveNotes(projId,phaseIdx,wIdx,tIdx,value) {
@@ -1244,13 +1424,13 @@ function openAssigneeDropdown(event, projId, phaseIdx, wIdx, tIdx) {
   const task = projectsData[projId]?.phases?.[phaseIdx]?.weeks?.[wIdx]?.tasks?.[tIdx];
   let html = '';
   Object.entries(usersData).forEach(([uid,u]) => {
-    if (u.status !== 'approved' && u.status !== undefined) return; // Only approved users
+    if (u.status !== 'approved' && u.status !== undefined) return;
     html += `<button class="assignee-option" onclick="assignTask('${projId}',${phaseIdx},${wIdx},${tIdx},'${uid}')">
       <img src="${u.photo||''}" onerror="this.style.display='none'"> ${u.name}
     </button>`;
   });
   if (task?.assignee) {
-    html += `<button class="assignee-option remove" onclick="assignTask('${projId}',${phaseIdx},${wIdx},${tIdx},'')">✕ Remover atribuição</button>`;
+    html += `<button class="assignee-option remove" onclick="assignTask('${projId}',${phaseIdx},${wIdx},${tIdx},'')">✕ Remover</button>`;
   }
   dd.innerHTML = html;
   document.body.appendChild(dd);
@@ -1276,8 +1456,14 @@ function openModal(html) {
   document.getElementById('modal-content').innerHTML = html;
   document.getElementById('modal-overlay').classList.add('open');
 }
-function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
-document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if(e.target===e.currentTarget) closeModal();
+});
 
 function openNewProjectModal() {
   openModal(`<h3>Nova Empresa / Projeto</h3>
@@ -1293,110 +1479,98 @@ function openNewProjectModal() {
     </div>`);
 }
 
-function selectColor(el) { el.parentElement.querySelectorAll('.color-opt').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); }
+function selectColor(el) {
+  el.parentElement.querySelectorAll('.color-opt').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
 
 function createProject() {
   const name = document.getElementById('np-name').value.trim();
   if (!name) return;
-  const id = name.toLowerCase().replace(/[^a-z0-9]/g,'-') + '-' + Date.now();
+  const projId = name.toLowerCase().replace(/\s+/g,'-');
   const proj = {
-    name, description: document.getElementById('np-desc').value.trim(),
-    icon: document.getElementById('np-icon').value.trim()||'🏢',
-    color: document.querySelector('#np-colors .selected')?.dataset.color || COLORS[0],
-    access: {},
-    phases: [{name:'Fase 1',description:'Primeira fase.',weeks:[
-      {num:'Sem 1',title:'Início',dates:'A definir',resp:'',tools:'',tasks:[{text:'Primeira tarefa',done:false,notes:'',assignee:'',doneBy:''}]}
-    ]}]
+    name,
+    icon: document.getElementById('np-icon').value || '🏢',
+    description: document.getElementById('np-desc').value.trim(),
+    color: document.querySelector('.color-opt.selected')?.dataset.color || '#3b82f6',
+    access: {[currentUser.uid]: 'owner'},
+    phases: [{name:'Fase 1', description:'Primeira fase', weeks:[{num:'Sem 1',title:'Início',dates:'A definir',resp:'',tools:'',tasks:[{text:'Primeira tarefa',done:false,notes:'',assignee:'',doneBy:''}]}]}]
   };
-  db.ref('projects/' + id).set(proj);
+  db.ref('projects/'+projId).set(proj);
   logActivity('criou', `o projeto "${name}"`);
   closeModal();
-  showProject(id);
+  showProject(projId);
 }
 
 function openEditProjectModal(projId) {
   const proj = projectsData[projId];
   if (!proj) return;
-
-  const approvedUsers = Object.entries(usersData)
-    .filter(([,u]) => u.status === 'approved' || u.status === undefined)
-    .map(([uid,u]) => ({uid,name:u.name}));
-
-  const currentAccess = proj.access || {};
-
-  let permissionsHTML = '';
-  if (approvedUsers.length > 0) {
-    permissionsHTML = `
-      <div class="permissions-section">
-        <div class="permissions-title">Permissões por Usuário</div>
-        <div class="permissions-grid">
-          ${approvedUsers.map(user => {
-            const access = currentAccess[user.uid];
-            return `<div class="permission-item">
-              <input type="checkbox" id="perm-${user.uid}" ${access?'checked':''} onchange="togglePermUser('${user.uid}', this.checked)">
-              <label for="perm-${user.uid}">${user.name}</label>
-              ${access ? `<select class="permission-role-select" onchange="setPermRole('${user.uid}', this.value)">
-                <option value="editor" ${access==='editor'?'selected':''}>Editor</option>
-                <option value="viewer" ${access==='viewer'?'selected':''}>Leitor</option>
-              </select>` : ''}
-            </div>`;
-          }).join('')}
-        </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:12px">
-          Se nenhum usuário for selecionado, todos os usuários aprovados terão acesso (sem restrição).
-        </div>
-      </div>
-    `;
-  }
-
-  openModal(`<h3>Editar Empresa</h3>
+  let html = `<h3>Editar ${proj.name}</h3>
     <div class="modal-field"><label class="modal-label">Nome</label><input class="modal-input" id="ep-name" value="${proj.name}"></div>
     <div class="modal-field"><label class="modal-label">Descrição</label><input class="modal-input" id="ep-desc" value="${proj.description||''}"></div>
-    <div class="modal-field"><label class="modal-label">Ícone</label><input class="modal-input" id="ep-icon" value="${proj.icon||''}" maxlength="4"></div>
+    <div class="modal-field"><label class="modal-label">Ícone</label><input class="modal-input" id="ep-icon" maxlength="4" value="${proj.icon}"></div>
     <div class="modal-field"><label class="modal-label">Cor</label>
-      <div class="color-options" id="ep-colors">${COLORS.map(c=>`<div class="color-opt ${c===proj.color?'selected':''}" style="background:${c}" data-color="${c}" onclick="selectColor(this)"></div>`).join('')}</div>
+      <div class="color-options">${COLORS.map(c=>`<div class="color-opt ${proj.color===c?'selected':''}" style="background:${c}" data-color="${c}" onclick="selectColor(this)"></div>`).join('')}</div>
     </div>
-    ${permissionsHTML}
+    <div class="permissions-section">
+      <div class="permissions-title">Acesso</div>
+      <div class="permissions-grid">`;
+
+  const access = proj.access || {};
+  Object.entries(usersData).forEach(([uid,u]) => {
+    if (u.status !== 'approved') return;
+    const role = access[uid] || '';
+    html += `<div class="permission-item">
+      <input type="checkbox" id="perm-${uid}" ${role?'checked':''} onchange="toggleProjectAccess('${projId}','${uid}')">
+      <label for="perm-${uid}">${u.name}</label>
+      <select class="permission-role-select" ${!role?'disabled':''} onchange="setProjectRole('${projId}','${uid}',this.value)">
+        <option value="viewer" ${role==='viewer'?'selected':''}>Visualizar</option>
+        <option value="editor" ${role==='editor'?'selected':''}>Editar</option>
+        <option value="owner" ${role==='owner'?'selected':''}>Owner</option>
+      </select>
+    </div>`;
+  });
+
+  html += `</div></div>
     <div class="modal-actions">
-      <button class="modal-btn" style="background:var(--red-bg);color:var(--red);margin-right:auto" onclick="deleteProject('${projId}')">Excluir</button>
       <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="modal-btn modal-btn-confirm" onclick="saveProjectEdit('${projId}')">Salvar</button>
-    </div>`);
+      <button class="modal-btn modal-btn-confirm" onclick="updateProject('${projId}')">Atualizar</button>
+      <button class="modal-btn" style="background:var(--red-bg);color:var(--red)" onclick="deleteProject('${projId}')">Excluir</button>
+    </div>`;
+
+  openModal(html);
 }
 
-function togglePermUser(uid, checked) {
-  const select = document.querySelector(`[onchange*="setPermRole('${uid}'"]`);
-  if (checked && !select) {
-    // Add role selector
-    const item = event.target.closest('.permission-item');
-    const newSelect = document.createElement('select');
-    newSelect.className = 'permission-role-select';
-    newSelect.innerHTML = '<option value="editor" selected>Editor</option><option value="viewer">Leitor</option>';
-    newSelect.onchange = () => setPermRole(uid, newSelect.value);
-    item.appendChild(newSelect);
-  } else if (!checked && select) {
-    select.remove();
+function toggleProjectAccess(projId, uid) {
+  const checkbox = document.getElementById('perm-'+uid);
+  const select = checkbox.parentElement.querySelector('.permission-role-select');
+  if (checkbox.checked) {
+    select.disabled = false;
+    setProjectRole(projId, uid, select.value || 'viewer');
+  } else {
+    select.disabled = true;
+    db.ref('projects/'+projId+'/access/'+uid).remove();
   }
 }
 
-function setPermRole(uid, role) {
-  // Store temporarily - will be saved with saveProjectEdit
+function setProjectRole(projId, uid, role) {
+  db.ref('projects/'+projId+'/access/'+uid).set(role);
 }
 
-function saveProjectEdit(projId) {
+function updateProject(projId) {
+  const proj = projectsData[projId];
   const updates = {
-    name: document.getElementById('ep-name').value.trim(),
+    name: document.getElementById('ep-name').value.trim() || proj.name,
     description: document.getElementById('ep-desc').value.trim(),
-    icon: document.getElementById('ep-icon').value.trim(),
-    color: document.querySelector('#ep-colors .selected')?.dataset.color
+    icon: document.getElementById('ep-icon').value || proj.icon,
+    color: document.querySelector('.color-opt.selected')?.dataset.color || proj.color
   };
 
-  // Gather permissions
   const access = {};
-  document.querySelectorAll('.permission-item input[type="checkbox"]:checked').forEach(checkbox => {
-    const uid = checkbox.id.replace('perm-','');
-    const select = checkbox.closest('.permission-item').querySelector('.permission-role-select');
-    access[uid] = select?.value || 'editor';
+  document.querySelectorAll('.permission-item input[type="checkbox"]:checked').forEach(el => {
+    const uid = el.id.replace('perm-','');
+    const select = el.parentElement.querySelector('.permission-role-select');
+    access[uid] = select.value;
   });
 
   if (Object.keys(access).length > 0) {
@@ -1406,14 +1580,16 @@ function saveProjectEdit(projId) {
   }
 
   db.ref('projects/'+projId).update(updates);
-  closeModal(); showProject(projId);
+  closeModal();
+  showProject(projId);
 }
 
 function deleteProject(projId) {
   if (!confirm('Excluir esta empresa e todas as tarefas?')) return;
   db.ref('projects/'+projId).remove();
   logActivity('excluiu', `o projeto "${projectsData[projId]?.name}"`);
-  closeModal(); showDashboard();
+  closeModal();
+  showDashboard();
 }
 
 function openAddPhaseModal() {
@@ -1436,7 +1612,9 @@ function addPhase() {
     weeks: [{num:'Sem 1',title:'Início',dates:'A definir',resp:'',tools:'',tasks:[{text:'Primeira tarefa',done:false,notes:'',assignee:'',doneBy:''}]}]
   });
   db.ref('projects/'+currentProject+'/phases').set(phases);
-  closeModal(); currentPhase = phases.length - 1; showProject(currentProject);
+  closeModal();
+  currentPhase = phases.length - 1;
+  showProject(currentProject);
 }
 
 function openAddWeekModal(projId, phaseIdx) {
@@ -1463,7 +1641,8 @@ function addWeek(projId, phaseIdx) {
     tasks: [{text:'Primeira tarefa',done:false,notes:'',assignee:'',doneBy:''}]
   });
   db.ref(`projects/${projId}/phases/${phaseIdx}/weeks`).set(weeks);
-  closeModal(); showProject(projId);
+  closeModal();
+  showProject(projId);
 }
 
 function renderUserBar() {
