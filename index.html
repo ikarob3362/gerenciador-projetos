@@ -519,6 +519,72 @@ let currentPhase = 0;
 let assigneeDropdownEl = null;
 let currentTheme = 'dark';
 
+// ======================== TELEGRAM INTEGRATION ========================
+const TG_BOT_TOKEN = '8401409685:AAGP1oYy1eaFw3EEQhhv62_NTba1WTRh9A0';
+const TG_API = `https://api.telegram.org/bot${TG_BOT_TOKEN}`;
+
+async function notifyTelegram(chatId, message) {
+  if (!chatId) return;
+  try {
+    await fetch(`${TG_API}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' })
+    });
+  } catch(e) { console.warn('Telegram notify error:', e); }
+}
+
+async function notifyTaskEvent(type, task, extra) {
+  const creatorName = usersData[currentUser?.uid]?.name || 'Alguém';
+  const assigneeName = task.assignee ? (usersData[task.assignee]?.name || 'N/A') : 'Sem atribuição';
+  const prioEmoji = {'Urgente':'🔴','Alta':'🟠','Média':'🟡','Baixa':'🟢'}[task.priority] || '⚪';
+  const dueStr = task.dueDate ? new Date(parseInt(task.dueDate)).toLocaleDateString('pt-BR') : 'Sem prazo';
+
+  let msg = '';
+  if (type === 'created') {
+    msg = `✅ <b>Nova Tarefa Criada</b>\n\n📋 <b>${task.title}</b>\n${task.description ? '📝 '+task.description+'\n' : ''}🏢 ${task.company || 'N/A'}\n${prioEmoji} Prioridade: ${task.priority || 'N/A'}\n👤 Responsável: ${assigneeName}\n📅 Prazo: ${dueStr}\n\n🔧 Criada por: ${creatorName}`;
+  } else if (type === 'status') {
+    msg = `🔄 <b>Status Alterado</b>\n\n📋 <b>${task.title}</b>\n➡️ Novo status: <b>${extra}</b>\n👤 Alterado por: ${creatorName}`;
+  } else if (type === 'updated') {
+    msg = `📝 <b>Tarefa Atualizada</b>\n\n📋 <b>${task.title}</b>\n🏢 ${task.company || 'N/A'}\n${prioEmoji} ${task.priority || 'N/A'}\n👤 Responsável: ${assigneeName}\n📅 Prazo: ${dueStr}\n\n🔧 Atualizada por: ${creatorName}`;
+  }
+
+  if (!msg) return;
+
+  // Notifica o responsável da tarefa (se tiver Telegram vinculado)
+  if (task.assignee && task.assignee !== currentUser?.uid) {
+    const assigneeTg = usersData[task.assignee]?.telegramChatId;
+    if (assigneeTg) await notifyTelegram(assigneeTg, msg);
+  }
+
+  // Notifica todos os admins que têm Telegram vinculado
+  for (const [uid, u] of Object.entries(usersData)) {
+    if (u.role === 'admin' && u.telegramChatId && uid !== currentUser?.uid) {
+      await notifyTelegram(u.telegramChatId, msg);
+    }
+  }
+}
+
+function linkTelegram() {
+  const code = currentUser.uid.substring(0,8);
+  openModal(`<h3>🔗 Vincular Telegram</h3>
+    <p style="color:var(--text2);font-size:14px;line-height:1.7;margin:16px 0">
+      Para receber notificações de tarefas no Telegram:
+    </p>
+    <ol style="color:var(--text2);font-size:14px;line-height:2;margin:0 0 16px 20px;text-align:left">
+      <li>Abra o bot <a href="https://t.me/Task_up_bot" target="_blank" style="color:var(--blue)">@Task_up_bot</a></li>
+      <li>Envie: <code style="background:var(--bg);padding:2px 8px;border-radius:4px;font-size:13px">/start ${code}</code></li>
+      <li>Pronto! Você receberá notificações.</li>
+    </ol>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;margin-bottom:16px">
+      <span style="font-size:12px;color:var(--text3)">Seu código de vinculação:</span><br>
+      <span style="font-size:20px;font-weight:700;letter-spacing:2px;color:var(--blue)">${code}</span>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Fechar</button>
+    </div>`);
+}
+
 // ======================== THEME MANAGEMENT ========================
 function initializeTheme() {
   const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
@@ -1131,6 +1197,7 @@ function changeTaskStatus(event, taskId, newStatus) {
   db.ref('tasks/'+taskId+'/status').set(newStatus);
   const task = tasksData[taskId];
   logActivity('alterou status', `"${task.title.substring(0,30)}" para ${newStatus}`);
+  notifyTaskEvent('status', task, newStatus);
 }
 
 function deleteTask(event, taskId) {
@@ -1193,6 +1260,7 @@ function updateTask(taskId) {
   };
   db.ref('tasks/'+taskId).update(updates);
   logActivity('atualizou tarefa', `"${updates.title.substring(0,30)}"`);
+  notifyTaskEvent('updated', updates);
   closeModal();
   showTasks();
 }
@@ -1248,6 +1316,7 @@ function createTask() {
 
   db.ref('tasks').push().set(newTask);
   logActivity('criou tarefa', `"${title.substring(0,30)}"`);
+  notifyTaskEvent('created', newTask);
   closeModal();
   showTasks();
 }
@@ -1653,6 +1722,7 @@ function renderUserBar() {
       <div class="user-name">${currentUser.name}</div>
       <div class="user-role">${usersData[currentUser.uid]?.role || 'membro'}</div>
     </div>
+    <button class="theme-toggle-btn" title="Vincular Telegram" onclick="linkTelegram()" style="font-size:16px">${usersData[currentUser.uid]?.telegramChatId ? '✈️' : '🔔'}</button>
     <button class="theme-toggle-btn" id="theme-toggle-btn" title="Alternar tema" onclick="cycleTheme()">${getThemeIcon()}</button>
     <button class="logout-btn" onclick="logout()">Sair</button>
   `;
