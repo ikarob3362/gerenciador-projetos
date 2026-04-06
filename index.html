@@ -1742,18 +1742,27 @@ function renderUserBar() {
   updateThemeToggleButton();
 }
 
+// ======================== CONFIG PADRÃO ========================
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyBC810jscH5K2rOrgw50qGK_IkDY4akB7M',
+  authDomain: 'gerenciador-ikaro.firebaseapp.com',
+  databaseURL: 'https://gerenciador-ikaro-default-rtdb.firebaseio.com',
+  projectId: 'gerenciador-ikaro'
+};
+
 // ======================== INIT ========================
 (function init() {
   initializeTheme();
-  const config = getSavedConfig();
-  if (!config) {
-    document.getElementById('setup-screen').classList.add('visible');
-    return;
-  }
+  // Usa config salvo ou o config padrão embutido
+  const config = getSavedConfig() || DEFAULT_FIREBASE_CONFIG;
   if (!initFirebase(config)) {
     localStorage.removeItem(CONFIG_KEY);
     document.getElementById('setup-screen').classList.add('visible');
     return;
+  }
+  // Salva o config para futuras visitas
+  if (!getSavedConfig()) {
+    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
   }
   document.getElementById('login-screen').style.display = 'flex';
   auth.onAuthStateChanged(onAuthStateChanged);
